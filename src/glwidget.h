@@ -1,6 +1,8 @@
 #pragma once
 
 #include <QGLWidget>
+#include <QMouseEvent>
+#include <QKeyEvent>
 #include <memory>
 
 #include "NebeskoTelo.h"
@@ -17,6 +19,8 @@ protected:
     void initializeGL();
     void paintGL();
     void resizeGL(int width, int height);
+    void mouseMoveEvent(QMouseEvent *event);
+    void keyPressEvent(QKeyEvent *event);
 
 private slots:
     void advanceTime();
@@ -27,7 +31,7 @@ private:
 
     long  prethodno_vreme = 0;
 
-    unsigned pogled = 0;
+    int pogled = 0;
     int visina = 40;
     int planeta = -1;
     int prethodno_y = -1;

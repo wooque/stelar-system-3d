@@ -1,6 +1,7 @@
 #include "glwidget.h"
 
 #include <QTimer>
+#include <QApplication>
 #include <cmath>
 #include <chrono>
 
@@ -55,6 +56,9 @@ GLWidget::GLWidget(QWidget *parent)
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(advanceTime()));
     timer->start(20);
+
+    setMouseTracking(true);
+    setFocusPolicy(Qt::StrongFocus);
 }
 
 GLWidget::~GLWidget()
@@ -159,88 +163,52 @@ void GLWidget::advanceTime()
     updateGL();
 }
 
-//void mouse_motion(int x, int y)
-//{
-//	if(prethodno_y == -1)
-//	{
-//		prethodno_y = y;
-//		return;
-//	}
+void GLWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    int y = event->y();
 
-//	int temp = y - prethodno_y;
+    if(prethodno_y == -1)
+    {
+        prethodno_y = y;
+        return;
+    }
 
-//	if(temp > 0)
-//		visina++;
-//	if(temp < 0)
-//		visina--;
+    int temp = y - prethodno_y;
 
-//	prethodno_y = y;
-//}
+    if(temp > 0)
+        visina++;
+    if(temp < 0)
+        visina--;
 
-//void mouse_action(int button, int state, int x, int y)
-//{
-//	switch(button)
-//	{
-//		case GLUT_LEFT_BUTTON:
-//			switch(state)
-//			{
-//				case GLUT_DOWN: break;
-//				case GLUT_UP: break;
-//			}
-//			break;
+    prethodno_y = y;
+}
 
-//		case GLUT_RIGHT_BUTTON:
-//			switch(state)
-//			{
-//				case GLUT_DOWN: break;
-//				case GLUT_UP: break;
-//			}
-//			break;
-//	}
-//}
+void GLWidget::keyPressEvent(QKeyEvent *event)
+{
+  switch (event->key())
+  {
+  case Qt::Key_Escape:
+      QApplication::quit();
+      break;
 
-//void special_key_down(int key, int x, int y)
-//{
-//	switch(key)
-//	{
-//		case GLUT_KEY_UP:
-//			if(planeta < Sunce->broj_satelita() - 1)
-//				planeta++;
-//			break;
+  case Qt::Key_Up :
+      if(planeta < Sunce->broj_satelita() - 1)
+          planeta++;
+      break;
 
-//		case GLUT_KEY_DOWN:
-//			if(planeta >= 0)
-//				planeta --;
-//			break;
+  case Qt::Key_Down:
+      if(planeta >= 0)
+          planeta --;
+      break;
 
-//		case GLUT_KEY_LEFT:
-//			if (pogled > 0)
-//				pogled--;
-//			break;
+  case Qt::Key_Left:
+      if (pogled > 0)
+          pogled--;
+      break;
 
-//		case GLUT_KEY_RIGHT:
-//			if (pogled < Sunce->broj_satelita())
-//				pogled++;
-//			break;
-
-//    case GLUT_KEY_F1: break;
-//    case GLUT_KEY_F2: break;
-//    case GLUT_KEY_F3: break;
-//    case GLUT_KEY_F4: break;
-//	}
-//}
-
-//void key_down(unsigned char key, int x, int y)
-//{
-//	switch(key)
-//	{
-//		// ESC
-//		case 27:
-//		  exit(0);
-//		  break;
-
-//		// razmak
-//		case 32: break;
-//		case '1': break;
-//	}
-//}
+  case Qt::Key_Right:
+      if (pogled < Sunce->broj_satelita())
+          pogled++;
+      break;
+  }
+}

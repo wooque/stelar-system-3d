@@ -1,0 +1,27 @@
+{
+    "background": "../teksture/zvezde.bmp",
+    "stars": [
+        {
+            "name": "sun",
+            "radius": 12,
+            "revolution_velocity": 0,
+            "revolution_radius": 0,
+            "rotation_velocity": 0,
+            "slope": 0,
+            "rotation_slope": 0,
+            "texture": "../teksture/gzvezda.bmp"
+        }
+    ],
+    "planets": [
+        {
+            "name": "mercur",
+            "radius": 0.3,
+            "revolution_velocity": 0.05,
+            "revolution_radius": 14,
+            "rotation_velocity": 0.01,
+            "slope": 0,
+            "rotation_slope": 0,
+            "texture": "../teksture/merkur.bmp"
+        }
+    ]
+}

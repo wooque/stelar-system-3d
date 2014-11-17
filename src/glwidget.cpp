@@ -2,6 +2,12 @@
 
 #include <QTimer>
 #include <QApplication>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QFile>
+#include <QString>
+#include <iostream>
+
 #include <cmath>
 #include <chrono>
 
@@ -18,6 +24,17 @@ using std::unique_ptr;
 GLWidget::GLWidget(QWidget *parent)
     : QGLWidget(parent)
 {
+    QString settings;
+    QFile file;
+    file.setFileName("../conf.json");
+    file.open(QIODevice::ReadOnly | QIODevice::Text);
+    settings = file.readAll();
+    file.close();
+
+    QJsonDocument sd = QJsonDocument::fromJson(settings.toUtf8());
+    QJsonObject sett2 = sd.object();
+    std::cout << sett2.value(QString("background")).toString().toStdString() << std::endl;
+
     pozadina = unique_ptr<NebeskoTelo>(new NebeskoTelo(200.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
                                                        unique_ptr<Tekstura>(new Tekstura("../teksture/zvezde.bmp")), true ));
 

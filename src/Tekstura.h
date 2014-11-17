@@ -1,50 +1,25 @@
 #pragma once
 
 #include "GL/gl.h"
-#include "glaux.h"
-
-#include <string>
-#include <memory>
+#include <QString>
+#include <QImage>
 
 class Tekstura
 {
-protected:
-      GLuint      id_teksture;
-      GLenum      tip_teksture;
-public:
-      Tekstura(GLenum tip): id_teksture(0), tip_teksture(tip) {}
-      virtual ~Tekstura();
-
-      virtual void napraviTeksturu() = 0;
-      virtual void primeniTeksturu();
-	  virtual void ponistiTeksturu();
-};
-
-class BMPTekstura : public Tekstura
-{
-protected:
-      std::string imeFajla;
-      std::unique_ptr<AUX_RGBImageRec> citajFajl();
+private:
+    GLuint  id_teksture;
+    GLenum  tip_teksture;
+    QString imeFajla;
+    QImage citajFajl();
 
 public:
-      BMPTekstura(std::string _imeFajla, GLenum tip)
-      : Tekstura(tip), imeFajla(_imeFajla) {}
-};
+    Tekstura(QString _imeFajla, GLenum tip = GL_TEXTURE_2D)
+        : id_teksture(0), tip_teksture(tip), imeFajla(_imeFajla) {}
 
-class BMPTekstura1D : public BMPTekstura
-{
-public:
-      BMPTekstura1D(std::string _imeFajla)
-      : BMPTekstura(_imeFajla, GL_TEXTURE_1D) {}
+    ~Tekstura();
 
-      virtual void napraviTeksturu();
-};
-
-class BMPTekstura2D : public BMPTekstura
-{
-public:
-      BMPTekstura2D(std::string _imeFajla)
-      : BMPTekstura(_imeFajla, GL_TEXTURE_2D) {}
-
-      virtual void napraviTeksturu();
+    void napraviTeksturu1D();
+    void napraviTeksturu2D();
+    void primeniTeksturu();
+    void ponistiTeksturu();
 };

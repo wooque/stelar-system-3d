@@ -126,15 +126,7 @@ void GLWidget::paintGL()
 
     long proteklo = 0;
     if( prethodno_vreme != 0 )
-    {
         proteklo = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() - prethodno_vreme;
-
-        //      if( proteklo < 40 )
-        //      {
-        //          glFinish();
-        //          return;
-        //      }
-    }
     else
         prethodno_vreme = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
 
@@ -144,7 +136,7 @@ void GLWidget::paintGL()
 
     prethodno_vreme += proteklo;
 
-    //  glFinish();
+//    glFinish();
 }
 
 void GLWidget::resizeGL(int width, int height)

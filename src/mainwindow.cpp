@@ -13,6 +13,6 @@ MainWindow::MainWindow()
     centralLayout->addWidget(glWidget, 0, 0);
     centralWidget->setLayout(centralLayout);
 
-    setWindowTitle(tr("Test"));
+    setWindowTitle(tr("Planetarium"));
     resize(1024, 600);
 }

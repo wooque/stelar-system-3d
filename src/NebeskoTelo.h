@@ -5,6 +5,9 @@
 #include <deque>
 #include <memory>
 #include <vector>
+#include <utility>
+
+const float RAD_PER_DEG = M_PI/180;
 
 class Prsten
 {
@@ -26,12 +29,12 @@ public:
 
     ~Prsten() {}
 
-    void crtajPrsten();
+    void crtajPrsten() const;
 };
 
 class NebeskoTelo
 {
-public:
+private:
     std::unique_ptr<Tekstura>                   tekstura;
     float                                       poluprecnik;
     float                                       ugao_revolucije;
@@ -79,15 +82,25 @@ public:
     ~NebeskoTelo() {}
 
     static void crtajSferu(float radius, int br_segmenata);
-    void crtaj();
-    void crtajTelo();
+    void crtaj() const;
+    void crtajTelo() const;
 
     void pomeri(int proteklo_vreme);
 
-    void dodajSatelit( std::unique_ptr<NebeskoTelo> p );
-    NebeskoTelo &getSatelit( unsigned i );
-    int broj_satelita()
+    void dodajSatelit( std::unique_ptr<NebeskoTelo> p )
+    {
+        sateliti.push_back( move(p) );
+    }
+
+    int broj_satelita() const
     {
         return sateliti.size();
     }
+
+    void dodajPrsten( std::unique_ptr<Prsten> arg_prsten )
+    {
+        prsten = std::move(arg_prsten);
+    }
+
+    std::pair<float, float> getSatelitPos(unsigned i) const;
 };

@@ -1,25 +1,30 @@
 #include "glwidget.h"
 
-#include <QTimer>
-#include <QApplication>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QFile>
-#include <QString>
-#include <iostream>
+#include "Tekstura.h"
+#include "NebeskoTelo.h"
 
 #include <cmath>
 #include <chrono>
 
-#include "GL/gl.h"
-#include "GL/glu.h"
+#include <GL/gl.h>
+#include <GL/glu.h>
 
-#include "Tekstura.h"
+#include <QTimer>
+#include <QApplication>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QFile>
+#include <QString>
+
+// test
+#include <iostream>
 
 using std::chrono::system_clock;
 using std::chrono::duration_cast;
 using std::chrono::milliseconds;
 using std::unique_ptr;
+using std::get;
 
 GLWidget::GLWidget(QWidget *parent)
     : QGLWidget(parent)
@@ -31,44 +36,75 @@ GLWidget::GLWidget(QWidget *parent)
     settings = file.readAll();
     file.close();
 
-    QJsonDocument sd = QJsonDocument::fromJson(settings.toUtf8());
-    QJsonObject sett2 = sd.object();
-    std::cout << sett2.value(QString("background")).toString().toStdString() << std::endl;
+    QJsonDocument systemJson = QJsonDocument::fromJson(settings.toUtf8());
+    QJsonObject system = systemJson.object();
+    QString background = system["background"].toString();
 
-    pozadina = unique_ptr<NebeskoTelo>(new NebeskoTelo(200.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
-                                                       unique_ptr<Tekstura>(new Tekstura("../teksture/zvezde.bmp")), true ));
+    pozadina = unique_ptr<NebeskoTelo>(new NebeskoTelo(500.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
+                                                       unique_ptr<Tekstura>(new Tekstura(background)), true));
 
-    Sunce = unique_ptr<NebeskoTelo>(new NebeskoTelo(12.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
-                                                    unique_ptr<Tekstura>(new Tekstura("../teksture/gzvezda.bmp")), true ));
+    const QString RADIUS = "radius";
+    const QString REVOLUTION_VELOCITY = "revolution_velocity";
+    const QString REVOLUTION_RADIUS = "revolution_radius";
+    const QString ROTATION_VELOCITY = "rotation_velocity";
+    const QString SLOPE = "slope";
+    const QString ROTATION_SLOPE = "rotation_slope";
+    const QString TEXTURE = "texture";
+    const QString RING = "ring";
+    const QString RING_INNER_RADIUS = "inner_radius";
+    const QString RING_OUTTER_RADIUS = "outter_radius";
+    const QString SATELLITE = "satellite";
 
-    Sunce->dodajSatelit( unique_ptr<NebeskoTelo>(new NebeskoTelo( 0.3f, 0.05f, 14.0f, 0.01f, 0.0f, 0.0f, 100,
-                                                                  unique_ptr<Tekstura>(new Tekstura("../teksture/merkur.bmp") )) ));
+    QJsonArray stars = system["stars"].toArray();
+    for(const QJsonValue &starValue: stars)
+    {
+        QJsonObject star = starValue.toObject();
+        Sunce = unique_ptr<NebeskoTelo>(new NebeskoTelo(star[RADIUS].toDouble(),
+                                                        star[REVOLUTION_VELOCITY].toDouble(),
+                                                        star[REVOLUTION_RADIUS].toDouble(),
+                                                        star[ROTATION_VELOCITY].toDouble(),
+                                                        star[SLOPE].toDouble(),
+                                                        star[ROTATION_SLOPE].toDouble(),
+                                                        0,
+                                                        unique_ptr<Tekstura>(new Tekstura(star[TEXTURE].toString())),
+                                                        true));
+        QJsonArray planets = system["planets"].toArray();
+        for(const QJsonValue &planetValue: planets)
+        {
+            QJsonObject planet = planetValue.toObject();
+            auto new_planet = unique_ptr<NebeskoTelo>(new NebeskoTelo(planet[RADIUS].toDouble(),
+                                                                      planet[REVOLUTION_VELOCITY].toDouble(),
+                                                                      planet[REVOLUTION_RADIUS].toDouble(),
+                                                                      planet[ROTATION_VELOCITY].toDouble(),
+                                                                      planet[SLOPE].toDouble(),
+                                                                      planet[ROTATION_SLOPE].toDouble(),
+                                                                      100,
+                                                                      unique_ptr<Tekstura>(new Tekstura(planet[TEXTURE].toString()))));
+            if(!planet[RING].isNull())
+            {
+                QJsonObject ring = planet[RING].toObject();
+                new_planet->dodajPrsten(unique_ptr<Prsten>(new Prsten(ring[RING_INNER_RADIUS].toDouble(),
+                                                                      ring[RING_OUTTER_RADIUS].toDouble(),
+                                                                      unique_ptr<Tekstura>(new Tekstura(ring[TEXTURE].toString())),
+                                                                      10)));
+            }
 
-    Sunce->dodajSatelit( unique_ptr<NebeskoTelo>(new NebeskoTelo( 0.93f, 0.03f, 24.0f, 0.02f, 0.0f, 30.0f, 100,
-                                                                  unique_ptr<Tekstura>(new Tekstura("../teksture/venera.bmp") ))) );
+            if(!planet[SATELLITE].isNull())
+            {
+                QJsonObject satellite = planet[SATELLITE].toObject();
+                new_planet->dodajSatelit(unique_ptr<NebeskoTelo>(new NebeskoTelo(satellite[RADIUS].toDouble(),
+                                                                                 satellite[REVOLUTION_VELOCITY].toDouble(),
+                                                                                 satellite[REVOLUTION_RADIUS].toDouble(),
+                                                                                 satellite[ROTATION_VELOCITY].toDouble(),
+                                                                                 satellite[SLOPE].toDouble(),
+                                                                                 satellite[ROTATION_SLOPE].toDouble(),
+                                                                                 100,
+                                                                                 unique_ptr<Tekstura>(new Tekstura(satellite[TEXTURE].toString())))));
+            }
 
-    auto p = unique_ptr<NebeskoTelo>(new NebeskoTelo( 1.0f, 0.01f, 35.0f, 0.03f, 23.5f, 0.0f, 100,
-                                                      unique_ptr<Tekstura>(new Tekstura("../teksture/zemlja.bmp"))));
-
-    p->dodajSatelit( unique_ptr<NebeskoTelo>(new NebeskoTelo( 0.2f, 0.1f, 5.0f, 0.04f, 0.0f, 0.0f, 100,
-                                                              unique_ptr<Tekstura>(new Tekstura("../teksture/mesec.bmp"))) ));
-    Sunce->dodajSatelit( std::move(p) );
-    Sunce->dodajSatelit( unique_ptr<NebeskoTelo>(new NebeskoTelo( 0.88f, 0.007f, 43.0f, 0.05f, 0.0f, 0.0f, 100,
-                                                                  unique_ptr<Tekstura>(new Tekstura("../teksture/mars.bmp") )) ));
-
-    Sunce->dodajSatelit( unique_ptr<NebeskoTelo>(new NebeskoTelo( 6.5f, 0.002f, 60.0f, 0.06f, 60.0f, 0.0f, 100,
-                                                                  unique_ptr<Tekstura>(new Tekstura("../teksture/jupiter.bmp")) ) ));
-
-    Sunce->dodajSatelit( unique_ptr<NebeskoTelo>(new NebeskoTelo( 4.7f, 0.0009f, 100.0f, 0.07f, 0.0f, 0.0f, 100,
-                                                                  unique_ptr<Tekstura>(new Tekstura("../teksture/saturn.bmp")),
-                                                                  false,
-                                                                  unique_ptr<Prsten>(new Prsten(1.5f, 2.5f, unique_ptr<Tekstura>(new Tekstura("../teksture/saturn-prsten.bmp")), 3))) ));
-
-    Sunce->dodajSatelit( unique_ptr<NebeskoTelo>(new NebeskoTelo( 3.3f, 0.0005f, 150.0f, 0.08f, 98.0f, 0.0f, 100,
-                                                                  unique_ptr<Tekstura>(new Tekstura("../teksture/uran.bmp") ))) );
-
-    Sunce->dodajSatelit( unique_ptr<NebeskoTelo>(new NebeskoTelo( 2.7f, 0.0003f, 190.0f, 0.09f, 0.0f, 10.0f, 100,
-                                                                  unique_ptr<Tekstura>(new Tekstura("../teksture/neptun.bmp") ))) );
+            Sunce->dodajSatelit( std::move(new_planet) );
+        }
+    }
 
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(advanceTime()));
@@ -119,18 +155,18 @@ void GLWidget::paintGL()
     }
     else
     {
-        auto &temp = Sunce->getSatelit(pogled - 1);
-        view_x = cos(temp.ugao_revolucije * 3.1415 / 180) * temp.poluprecnik_revolucije;
-        view_z = -sin(temp.ugao_revolucije * 3.1415 / 180) * temp.poluprecnik_revolucije;
+        auto temp = Sunce->getSatelitPos(pogled - 1);
+        view_x = get<0>(temp);
+        view_z = get<1>(temp);
     }
 
     int pos_x;
     int pos_z;
     if(planeta != -1)
     {
-        auto &temp = Sunce->getSatelit(planeta);
-        pos_x = cos(temp.ugao_revolucije * 3.1415 / 180) * temp.poluprecnik_revolucije;
-        pos_z = -sin(temp.ugao_revolucije * 3.1415 / 180) * temp.poluprecnik_revolucije;
+        auto temp = Sunce->getSatelitPos(planeta);
+        pos_x = get<0>(temp);
+        pos_z = get<1>(temp);
     }
     else
     {

@@ -6,8 +6,6 @@
 using std::unique_ptr;
 using std::move;
 
-#define rad_per_deg 0.0174533f
-
 void NebeskoTelo::crtajSferu(float radius, int br_segmenata)
 {
     float step = 90.0f / br_segmenata;
@@ -17,13 +15,13 @@ void NebeskoTelo::crtajSferu(float radius, int br_segmenata)
     for( theta = 0; theta < 90; theta += step )
     {
         glBegin(GL_QUAD_STRIP);
-        x1 = radius * cos(theta * rad_per_deg);
+        x1 = radius * cos(theta * RAD_PER_DEG);
         z1 = 0;
-        y1 = radius * sin(theta * rad_per_deg);
+        y1 = radius * sin(theta * RAD_PER_DEG);
 
-        x2 = radius * cos( (theta+step) * rad_per_deg);
+        x2 = radius * cos( (theta+step) * RAD_PER_DEG);
         z2 = 0;
-        y2 = radius * sin( (theta+step) * rad_per_deg);
+        y2 = radius * sin( (theta+step) * RAD_PER_DEG);
 
         glNormal3f(x1, y1, z1);
         glTexCoord2f(0, 0.5f + theta/180);
@@ -35,13 +33,13 @@ void NebeskoTelo::crtajSferu(float radius, int br_segmenata)
 
         for( phi = step; phi <= 360; phi += step)
         {
-            x1 = radius * cos(theta * rad_per_deg) * cos(phi * rad_per_deg);
-            z1 = radius * cos(theta * rad_per_deg) * sin(phi * rad_per_deg);
-            y1 = radius * sin(theta * rad_per_deg);
+            x1 = radius * cos(theta * RAD_PER_DEG) * cos(phi * RAD_PER_DEG);
+            z1 = radius * cos(theta * RAD_PER_DEG) * sin(phi * RAD_PER_DEG);
+            y1 = radius * sin(theta * RAD_PER_DEG);
 
-            x2 = radius * cos((theta+step) * rad_per_deg) * cos(phi * rad_per_deg);
-            z2 = radius * cos((theta+step) * rad_per_deg) * sin(phi * rad_per_deg);
-            y2 = radius * sin((theta+step) * rad_per_deg);
+            x2 = radius * cos((theta+step) * RAD_PER_DEG) * cos(phi * RAD_PER_DEG);
+            z2 = radius * cos((theta+step) * RAD_PER_DEG) * sin(phi * RAD_PER_DEG);
+            y2 = radius * sin((theta+step) * RAD_PER_DEG);
 
             glNormal3f(x1, y1, z1);
             glTexCoord2f(phi/360, 0.5f + theta/180);
@@ -59,13 +57,13 @@ void NebeskoTelo::crtajSferu(float radius, int br_segmenata)
     for( theta = 0; theta > -90; theta -= step )
     {
         glBegin(GL_QUAD_STRIP);
-        x1 = radius * cos(theta * rad_per_deg);
+        x1 = radius * cos(theta * RAD_PER_DEG);
         z1 = 0;
-        y1 = radius * sin(theta * rad_per_deg);
+        y1 = radius * sin(theta * RAD_PER_DEG);
 
-        x2 = radius * cos( (theta-step) * rad_per_deg);
+        x2 = radius * cos( (theta-step) * RAD_PER_DEG);
         z2 = 0;
-        y2 = radius * sin( (theta-step) * rad_per_deg);
+        y2 = radius * sin( (theta-step) * RAD_PER_DEG);
 
         glNormal3f(x1, y1, z1);
         glTexCoord2f(0, 0.5f + theta/180);
@@ -77,13 +75,13 @@ void NebeskoTelo::crtajSferu(float radius, int br_segmenata)
 
         for( phi = step; phi <= 360; phi += step)
         {
-            x1 = radius * cos(theta * rad_per_deg) * cos(phi * rad_per_deg);
-            z1 = radius * cos(theta * rad_per_deg) * sin(phi * rad_per_deg);
-            y1 = radius * sin(theta * rad_per_deg);
+            x1 = radius * cos(theta * RAD_PER_DEG) * cos(phi * RAD_PER_DEG);
+            z1 = radius * cos(theta * RAD_PER_DEG) * sin(phi * RAD_PER_DEG);
+            y1 = radius * sin(theta * RAD_PER_DEG);
 
-            x2 = radius * cos((theta-step) * rad_per_deg) * cos(phi * rad_per_deg);
-            z2 = radius * cos((theta-step) * rad_per_deg) * sin(phi * rad_per_deg);
-            y2 = radius * sin((theta-step) * rad_per_deg);
+            x2 = radius * cos((theta-step) * RAD_PER_DEG) * cos(phi * RAD_PER_DEG);
+            z2 = radius * cos((theta-step) * RAD_PER_DEG) * sin(phi * RAD_PER_DEG);
+            y2 = radius * sin((theta-step) * RAD_PER_DEG);
 
             glNormal3f(x1, y1, z1);
             glTexCoord2f(phi/360, 0.5f + theta/180);
@@ -99,7 +97,7 @@ void NebeskoTelo::crtajSferu(float radius, int br_segmenata)
     }
 }
 
-void NebeskoTelo::crtaj()
+void NebeskoTelo::crtaj() const
 {
     glPushMatrix();
     glRotated( nagib_ravni, 1, 0, 0 );
@@ -112,7 +110,7 @@ void NebeskoTelo::crtaj()
     for (unsigned i = 0; i < segmenti.size(); i++)
     {
         float ugao = segmenti[i];
-        glVertex3f(cos(rad_per_deg * ugao) * poluprecnik_revolucije, 0, -sin(rad_per_deg * ugao) * poluprecnik_revolucije);
+        glVertex3f(cos(RAD_PER_DEG * ugao) * poluprecnik_revolucije, 0, -sin(RAD_PER_DEG * ugao) * poluprecnik_revolucije);
     }
     glEnd();
     glPopMatrix();
@@ -148,17 +146,15 @@ void NebeskoTelo::pomeri(int proteklo_vreme)
 
 }
 
-void NebeskoTelo::dodajSatelit(std::unique_ptr<NebeskoTelo> p)
+std::pair<float, float> NebeskoTelo::getSatelitPos(unsigned i) const
 {
-    sateliti.push_back( move(p) );
+    const NebeskoTelo &satelit = *sateliti.at(i);
+    return std::make_pair<float, float>(
+                cos(satelit.ugao_revolucije * RAD_PER_DEG) * satelit.poluprecnik_revolucije,
+                -sin(satelit.ugao_revolucije * RAD_PER_DEG) * satelit.poluprecnik_revolucije);
 }
 
-NebeskoTelo &NebeskoTelo::getSatelit(unsigned i)
-{
-    return *sateliti.at(i);
-}
-
-void NebeskoTelo::crtajTelo()
+void NebeskoTelo::crtajTelo() const
 {
     if( !is_star )
         glEnable(GL_LIGHTING);
@@ -183,7 +179,7 @@ void NebeskoTelo::crtajTelo()
     glPopMatrix();
 }
 
-void Prsten::crtajPrsten()
+void Prsten::crtajPrsten() const
 {
     glDisable(GL_LIGHTING);
     //glDisable(GL_DEPTH);
@@ -194,8 +190,8 @@ void Prsten::crtajPrsten()
     int seg = 90.0 / prsten_n;
     for ( unsigned i = 0; i <= 360; i+=seg )
     {
-        float cos_t = cos(i * rad_per_deg);
-        float sin_t = sin(i * rad_per_deg);
+        float cos_t = cos(i * RAD_PER_DEG);
+        float sin_t = sin(i * RAD_PER_DEG);
         glTexCoord2d(0, i);
         glVertex3d(cos_t * unut_r, 0, -sin_t * unut_r);
         glTexCoord2d(1, i);

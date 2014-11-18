@@ -11,10 +11,10 @@
             "rotation_slope": 0,
             "texture": "../teksture/gzvezda.bmp"
         }
-    ],
+     ],
     "planets": [
         {
-            "name": "mercur",
+            "name": "mercury",
             "radius": 0.3,
             "revolution_velocity": 0.05,
             "revolution_radius": 14,
@@ -22,6 +22,91 @@
             "slope": 0,
             "rotation_slope": 0,
             "texture": "../teksture/merkur.bmp"
+        },
+        {
+            "name": "venus",
+            "radius": 0.93,
+            "revolution_velocity": 0.03,
+            "revolution_radius": 24,
+            "rotation_velocity": 0.02,
+            "slope": 0,
+            "rotation_slope": 30,
+            "texture": "../teksture/venera.bmp"
+        },
+        {
+            "name": "earth",
+            "radius": 1,
+            "revolution_velocity": 0.01,
+            "revolution_radius": 35,
+            "rotation_velocity": 0.03,
+            "slope": 23.5,
+            "rotation_slope": 0,
+            "texture": "../teksture/zemlja.bmp",
+            "satellite": {
+                "name": "moon",
+                "radius": 0.2,
+                "revolution_velocity": 0.1,
+                "revolution_radius": 5.0,
+                "rotation_velocity": 0.04,
+                "slope": 0,
+                "rotation_slope": 0,
+                "texture": "../teksture/mesec.bmp"
+             }
+        },
+        {
+            "name": "mars",
+            "radius": 0.88,
+            "revolution_velocity": 0.007,
+            "revolution_radius": 43,
+            "rotation_velocity": 0.05,
+            "slope": 0,
+            "rotation_slope": 0,
+            "texture": "../teksture/mars.bmp"
+        },
+        {
+            "name": "jupiter",
+            "radius": 6.5,
+            "revolution_velocity": 0.002,
+            "revolution_radius": 60,
+            "rotation_velocity": 0.06,
+            "slope": 60,
+            "rotation_slope": 0,
+            "texture": "../teksture/jupiter.bmp"
+        },
+        {
+            "name": "saturn",
+            "radius": 4.7,
+            "revolution_velocity": 0.0009,
+            "revolution_radius": 100,
+            "rotation_velocity": 0.07,
+            "slope": 0,
+            "rotation_slope": 0,
+            "texture": "../teksture/saturn.bmp",
+            "ring": {
+                "inner_radius": 1.5,
+                "outter_radius": 2.5,
+                "texture": "../teksture/saturn-prsten.bmp"
+             }
+        },
+        {
+            "name": "uranus",
+            "radius": 3.3,
+            "revolution_velocity": 0.0005,
+            "revolution_radius": 150,
+            "rotation_velocity": 0.08,
+            "slope": 98,
+            "rotation_slope": 0,
+            "texture": "../teksture/uran.bmp"
+        },
+        {
+            "name": "neptune",
+            "radius": 2.7,
+            "revolution_velocity": 0.0003,
+            "revolution_radius": 190,
+            "rotation_velocity": 0.09,
+            "slope": 0,
+            "rotation_slope": 10,
+            "texture": "../teksture/neptun.bmp"
         }
     ]
 }

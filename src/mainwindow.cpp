@@ -11,6 +11,7 @@ MainWindow::MainWindow()
     glWidget = new GLWidget;
 
     glWidgetArea = new QScrollArea;
+    glWidgetArea->setFocusPolicy(Qt::NoFocus);
     glWidgetArea->setWidget(glWidget);
     glWidgetArea->setWidgetResizable(true);
     glWidgetArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

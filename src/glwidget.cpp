@@ -78,7 +78,7 @@ GLWidget::GLWidget(QWidget *parent)
                                                                       planet[ROTATION_VELOCITY].toDouble(),
                                                                       planet[SLOPE].toDouble(),
                                                                       planet[ROTATION_SLOPE].toDouble(),
-                                                                      100,
+                                                                      200,
                                                                       unique_ptr<Tekstura>(new Tekstura(planet[TEXTURE].toString()))));
             if(!planet[RING].isNull())
             {
@@ -98,7 +98,7 @@ GLWidget::GLWidget(QWidget *parent)
                                                                                  satellite[ROTATION_VELOCITY].toDouble(),
                                                                                  satellite[SLOPE].toDouble(),
                                                                                  satellite[ROTATION_SLOPE].toDouble(),
-                                                                                 100,
+                                                                                 200,
                                                                                  unique_ptr<Tekstura>(new Tekstura(satellite[TEXTURE].toString())))));
             }
 

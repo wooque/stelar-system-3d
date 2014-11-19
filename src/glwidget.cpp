@@ -100,7 +100,7 @@ void GLWidget::loadConfiguration(QString filename)
                                                                       planet[ROTATION_VELOCITY].toDouble(),
                                                                       planet[SLOPE].toDouble(),
                                                                       planet[ROTATION_SLOPE].toDouble(),
-                                                                      200,
+                                                                      150,
                                                                       unique_ptr<Tekstura>(new Tekstura(confDir + planet[TEXTURE].toString()))));
             if(!planet[RING].isNull())
             {
@@ -123,7 +123,7 @@ void GLWidget::loadConfiguration(QString filename)
                                                                                      satellite[ROTATION_VELOCITY].toDouble(),
                                                                                      satellite[SLOPE].toDouble(),
                                                                                      satellite[ROTATION_SLOPE].toDouble(),
-                                                                                     200,
+                                                                                     50,
                                                                                      unique_ptr<Tekstura>(new Tekstura(confDir + satellite[TEXTURE].toString())))));
                 }
             }
@@ -154,6 +154,9 @@ void GLWidget::initializeGL()
 
     glEnable(GL_LIGHT1);
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     srand(time(nullptr));
 }
 
@@ -167,8 +170,8 @@ void GLWidget::paintGL()
     if(!isInitialise())
         return;
 
-    int view_x;
-    int view_z;
+    double view_x;
+    double view_z;
     if(pogled == 0)
     {
         view_x = 0;

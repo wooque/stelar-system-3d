@@ -1,6 +1,8 @@
 #include "NebeskoTelo.h"
 
 #include <cmath>
+
+//test
 #include <iostream>
 
 using std::unique_ptr;
@@ -105,10 +107,11 @@ void NebeskoTelo::crtaj() const
     glDisable(GL_LIGHTING);
     glPushMatrix();
     glLineWidth(1);
-    glColor3f(1, 1, 1);
     glBegin(GL_LINE_STRIP);
     for (unsigned i = 0; i < segmenti.size(); i++)
     {
+        float clr = 0.75f * ((float)i)/segmenti.size();
+        glColor4f(1, 1, 1, clr);
         float ugao = segmenti[i];
         glVertex3f(cos(RAD_PER_DEG * ugao) * poluprecnik_revolucije, 0, -sin(RAD_PER_DEG * ugao) * poluprecnik_revolucije);
     }
@@ -159,7 +162,10 @@ void NebeskoTelo::crtajTelo() const
     if( !is_star )
         glEnable(GL_LIGHTING);
     else
+    {
         glDisable(GL_LIGHTING);
+        glDisable(GL_BLEND);
+    }
 
     glPushMatrix();
 
@@ -175,6 +181,9 @@ void NebeskoTelo::crtajTelo() const
 
     if (prsten)
         prsten->crtajPrsten();
+
+    if (is_star)
+        glEnable(GL_BLEND);
 
     glPopMatrix();
 }

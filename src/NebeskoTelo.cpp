@@ -190,8 +190,7 @@ void NebeskoTelo::crtajTelo() const
 void Prsten::crtajPrsten() const
 {
     glDisable(GL_LIGHTING);
-    //glDisable(GL_DEPTH);
-    //glEnable(GL_BLEND);
+//    glDisable(GL_DEPTH);
     glBegin(GL_QUAD_STRIP);
     if( tex_prsten )
         tex_prsten->primeniTeksturu();
@@ -206,6 +205,5 @@ void Prsten::crtajPrsten() const
         glVertex3d(cos_t * spolj_r, 0, -sin_t * spolj_r);
     }
     glEnd();
-    //glDisable(GL_BLEND);
-    //glEnable(GL_DEPTH);
+//    glEnable(GL_DEPTH);
 }

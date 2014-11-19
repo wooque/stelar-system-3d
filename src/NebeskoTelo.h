@@ -102,5 +102,5 @@ public:
         prsten = std::move(arg_prsten);
     }
 
-    std::pair<float, float> getSatelitPos(unsigned i) const;
+    std::pair<float, float> getPos() const;
 };

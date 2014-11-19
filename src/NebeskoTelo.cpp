@@ -149,12 +149,11 @@ void NebeskoTelo::pomeri(int proteklo_vreme)
 
 }
 
-std::pair<float, float> NebeskoTelo::getSatelitPos(unsigned i) const
+std::pair<float, float> NebeskoTelo::getPos() const
 {
-    const NebeskoTelo &satelit = *sateliti.at(i);
     return std::make_pair<float, float>(
-                cos(satelit.ugao_revolucije * RAD_PER_DEG) * satelit.poluprecnik_revolucije,
-                -sin(satelit.ugao_revolucije * RAD_PER_DEG) * satelit.poluprecnik_revolucije);
+                cos(ugao_revolucije * RAD_PER_DEG) * poluprecnik_revolucije,
+                -sin(ugao_revolucije * RAD_PER_DEG) * poluprecnik_revolucije);
 }
 
 void NebeskoTelo::crtajTelo() const

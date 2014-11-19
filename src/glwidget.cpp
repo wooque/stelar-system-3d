@@ -77,65 +77,66 @@ void GLWidget::loadConfiguration(QString filename)
     const QString RING_OUTTER_RADIUS = "outter_radius";
     const QString SATELLITES = "satellites";
 
-    QJsonArray stars = system[STARS].toArray();
-    for(const QJsonValue &starValue: stars)
+    QJsonArray starsArray = system[STARS].toArray();
+    for(const QJsonValue &starValue: starsArray)
     {
         QJsonObject star = starValue.toObject();
-        Sunce = unique_ptr<NebeskoTelo>(new NebeskoTelo(star[RADIUS].toDouble(),
-                                                        star[REVOLUTION_VELOCITY].toDouble(),
-                                                        star[REVOLUTION_RADIUS].toDouble(),
-                                                        star[ROTATION_VELOCITY].toDouble(),
-                                                        star[SLOPE].toDouble(),
-                                                        star[ROTATION_SLOPE].toDouble(),
-                                                        0,
-                                                        unique_ptr<Tekstura>(new Tekstura(confDir + star[TEXTURE].toString())),
-                                                        true));
-        QJsonArray planets = system[PLANETS].toArray();
-        for(const QJsonValue &planetValue: planets)
+        stars.push_back(unique_ptr<NebeskoTelo>(new NebeskoTelo(star[RADIUS].toDouble(),
+                                                                star[REVOLUTION_VELOCITY].toDouble(),
+                                                                star[REVOLUTION_RADIUS].toDouble(),
+                                                                star[ROTATION_VELOCITY].toDouble(),
+                                                                star[SLOPE].toDouble(),
+                                                                star[ROTATION_SLOPE].toDouble(),
+                                                                0,
+                                                                unique_ptr<Tekstura>(new Tekstura(confDir + star[TEXTURE].toString())),
+                                                                true)));
+    }
+
+    QJsonArray planetsArray = system[PLANETS].toArray();
+    for(const QJsonValue &planetValue: planetsArray)
+    {
+        QJsonObject planet = planetValue.toObject();
+        auto new_planet = unique_ptr<NebeskoTelo>(new NebeskoTelo(planet[RADIUS].toDouble(),
+                                                                  planet[REVOLUTION_VELOCITY].toDouble(),
+                                                                  planet[REVOLUTION_RADIUS].toDouble(),
+                                                                  planet[ROTATION_VELOCITY].toDouble(),
+                                                                  planet[SLOPE].toDouble(),
+                                                                  planet[ROTATION_SLOPE].toDouble(),
+                                                                  150,
+                                                                  unique_ptr<Tekstura>(new Tekstura(confDir + planet[TEXTURE].toString()))));
+        if(!planet[RING].isNull())
         {
-            QJsonObject planet = planetValue.toObject();
-            auto new_planet = unique_ptr<NebeskoTelo>(new NebeskoTelo(planet[RADIUS].toDouble(),
-                                                                      planet[REVOLUTION_VELOCITY].toDouble(),
-                                                                      planet[REVOLUTION_RADIUS].toDouble(),
-                                                                      planet[ROTATION_VELOCITY].toDouble(),
-                                                                      planet[SLOPE].toDouble(),
-                                                                      planet[ROTATION_SLOPE].toDouble(),
-                                                                      150,
-                                                                      unique_ptr<Tekstura>(new Tekstura(confDir + planet[TEXTURE].toString()))));
-            if(!planet[RING].isNull())
-            {
-                QJsonObject ring = planet[RING].toObject();
-                new_planet->dodajPrsten(unique_ptr<Prsten>(new Prsten(ring[RING_INNER_RADIUS].toDouble(),
-                                                                      ring[RING_OUTTER_RADIUS].toDouble(),
-                                                                      unique_ptr<Tekstura>(new Tekstura(confDir + ring[TEXTURE].toString())),
-                                                                      10)));
-            }
-
-            if(!planet[SATELLITES].isNull())
-            {
-                QJsonArray satellites = planet[SATELLITES].toArray();
-                for(const QJsonValue &satelliteValue: satellites)
-                {
-                    QJsonObject satellite = satelliteValue.toObject();
-                    new_planet->dodajSatelit(unique_ptr<NebeskoTelo>(new NebeskoTelo(satellite[RADIUS].toDouble(),
-                                                                                     satellite[REVOLUTION_VELOCITY].toDouble(),
-                                                                                     satellite[REVOLUTION_RADIUS].toDouble(),
-                                                                                     satellite[ROTATION_VELOCITY].toDouble(),
-                                                                                     satellite[SLOPE].toDouble(),
-                                                                                     satellite[ROTATION_SLOPE].toDouble(),
-                                                                                     50,
-                                                                                     unique_ptr<Tekstura>(new Tekstura(confDir + satellite[TEXTURE].toString())))));
-                }
-            }
-
-            Sunce->dodajSatelit( std::move(new_planet) );
+            QJsonObject ring = planet[RING].toObject();
+            new_planet->dodajPrsten(unique_ptr<Prsten>(new Prsten(ring[RING_INNER_RADIUS].toDouble(),
+                                                                  ring[RING_OUTTER_RADIUS].toDouble(),
+                                                                  unique_ptr<Tekstura>(new Tekstura(confDir + ring[TEXTURE].toString())),
+                                                                  10)));
         }
+
+        if(!planet[SATELLITES].isNull())
+        {
+            QJsonArray satellites = planet[SATELLITES].toArray();
+            for(const QJsonValue &satelliteValue: satellites)
+            {
+                QJsonObject satellite = satelliteValue.toObject();
+                new_planet->dodajSatelit(unique_ptr<NebeskoTelo>(new NebeskoTelo(satellite[RADIUS].toDouble(),
+                                                                                 satellite[REVOLUTION_VELOCITY].toDouble(),
+                                                                                 satellite[REVOLUTION_RADIUS].toDouble(),
+                                                                                 satellite[ROTATION_VELOCITY].toDouble(),
+                                                                                 satellite[SLOPE].toDouble(),
+                                                                                 satellite[ROTATION_SLOPE].toDouble(),
+                                                                                 50,
+                                                                                 unique_ptr<Tekstura>(new Tekstura(confDir + satellite[TEXTURE].toString())))));
+            }
+        }
+
+        planets.push_back( std::move(new_planet) );
     }
 }
 
 bool GLWidget::isInitialise() const
 {
-    return (Sunce && pozadina);
+    return (pozadina && !stars.empty() && !planets.empty());
 }
 void GLWidget::initializeGL()
 {
@@ -179,7 +180,7 @@ void GLWidget::paintGL()
     }
     else
     {
-        auto temp = Sunce->getSatelitPos(pogled - 1);
+        auto temp = planets.at(pogled - 1)->getPos();
         view_x = get<0>(temp);
         view_z = get<1>(temp);
     }
@@ -188,7 +189,7 @@ void GLWidget::paintGL()
     int pos_z;
     if(planeta != -1)
     {
-        auto temp = Sunce->getSatelitPos(planeta);
+        auto temp = planets.at(planeta)->getPos();
         pos_x = get<0>(temp);
         pos_z = get<1>(temp);
     }
@@ -208,8 +209,18 @@ void GLWidget::paintGL()
         prethodno_vreme = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
 
     pozadina->crtaj();
-    Sunce->crtaj();
-    Sunce->pomeri(proteklo);
+
+    for(const auto &star: stars)
+    {
+        star->crtaj();
+        star->pomeri(proteklo);
+    }
+
+    for(const auto &planet: planets)
+    {
+        planet->crtaj();
+        planet->pomeri(proteklo);
+    }
 
     prethodno_vreme += proteklo;
 
@@ -267,7 +278,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         break;
 
     case Qt::Key_Up :
-        if(planeta < Sunce->broj_satelita() - 1)
+        if(planeta < (int)planets.size() - 1)
             planeta++;
         break;
 
@@ -282,7 +293,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         break;
 
     case Qt::Key_Right:
-        if (pogled < Sunce->broj_satelita())
+        if (pogled < (int)planets.size())
             pogled++;
         break;
     }

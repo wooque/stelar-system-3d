@@ -3,6 +3,7 @@
 #include <QGLWidget>
 #include <QMouseEvent>
 #include <QKeyEvent>
+#include <vector>
 #include <memory>
 
 #include "NebeskoTelo.h"
@@ -30,8 +31,9 @@ private slots:
     void advanceTime();
 
 private:
-    std::unique_ptr<NebeskoTelo> Sunce;
     std::unique_ptr<NebeskoTelo> pozadina;
+    std::vector<std::unique_ptr<NebeskoTelo>> stars;
+    std::vector<std::unique_ptr<NebeskoTelo>> planets;
 
     long  prethodno_vreme = 0;
 

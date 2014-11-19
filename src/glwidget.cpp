@@ -63,6 +63,8 @@ void GLWidget::loadConfiguration(QString filename)
     pozadina = unique_ptr<NebeskoTelo>(new NebeskoTelo(500.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
                                                        unique_ptr<Tekstura>(new Tekstura(confDir + background)), true));
 
+    const QString STARS = "stars";
+    const QString PLANETS = "planets";
     const QString RADIUS = "radius";
     const QString REVOLUTION_VELOCITY = "revolution_velocity";
     const QString REVOLUTION_RADIUS = "revolution_radius";
@@ -73,9 +75,9 @@ void GLWidget::loadConfiguration(QString filename)
     const QString RING = "ring";
     const QString RING_INNER_RADIUS = "inner_radius";
     const QString RING_OUTTER_RADIUS = "outter_radius";
-    const QString SATELLITE = "satellite";
+    const QString SATELLITES = "satellites";
 
-    QJsonArray stars = system["stars"].toArray();
+    QJsonArray stars = system[STARS].toArray();
     for(const QJsonValue &starValue: stars)
     {
         QJsonObject star = starValue.toObject();
@@ -88,7 +90,7 @@ void GLWidget::loadConfiguration(QString filename)
                                                         0,
                                                         unique_ptr<Tekstura>(new Tekstura(confDir + star[TEXTURE].toString())),
                                                         true));
-        QJsonArray planets = system["planets"].toArray();
+        QJsonArray planets = system[PLANETS].toArray();
         for(const QJsonValue &planetValue: planets)
         {
             QJsonObject planet = planetValue.toObject();
@@ -109,17 +111,21 @@ void GLWidget::loadConfiguration(QString filename)
                                                                       10)));
             }
 
-            if(!planet[SATELLITE].isNull())
+            if(!planet[SATELLITES].isNull())
             {
-                QJsonObject satellite = planet[SATELLITE].toObject();
-                new_planet->dodajSatelit(unique_ptr<NebeskoTelo>(new NebeskoTelo(satellite[RADIUS].toDouble(),
-                                                                                 satellite[REVOLUTION_VELOCITY].toDouble(),
-                                                                                 satellite[REVOLUTION_RADIUS].toDouble(),
-                                                                                 satellite[ROTATION_VELOCITY].toDouble(),
-                                                                                 satellite[SLOPE].toDouble(),
-                                                                                 satellite[ROTATION_SLOPE].toDouble(),
-                                                                                 200,
-                                                                                 unique_ptr<Tekstura>(new Tekstura(confDir + satellite[TEXTURE].toString())))));
+                QJsonArray satellites = planet[SATELLITES].toArray();
+                for(const QJsonValue &satelliteValue: satellites)
+                {
+                    QJsonObject satellite = satelliteValue.toObject();
+                    new_planet->dodajSatelit(unique_ptr<NebeskoTelo>(new NebeskoTelo(satellite[RADIUS].toDouble(),
+                                                                                     satellite[REVOLUTION_VELOCITY].toDouble(),
+                                                                                     satellite[REVOLUTION_RADIUS].toDouble(),
+                                                                                     satellite[ROTATION_VELOCITY].toDouble(),
+                                                                                     satellite[SLOPE].toDouble(),
+                                                                                     satellite[ROTATION_SLOPE].toDouble(),
+                                                                                     200,
+                                                                                     unique_ptr<Tekstura>(new Tekstura(confDir + satellite[TEXTURE].toString())))));
+                }
             }
 
             Sunce->dodajSatelit( std::move(new_planet) );

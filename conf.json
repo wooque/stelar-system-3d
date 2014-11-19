@@ -42,16 +42,18 @@
             "slope": 23.5,
             "rotation_slope": 0,
             "texture": "teksture/zemlja.bmp",
-            "satellite": {
-                "name": "moon",
-                "radius": 0.2,
-                "revolution_velocity": 0.1,
-                "revolution_radius": 5.0,
-                "rotation_velocity": 0.04,
-                "slope": 0,
-                "rotation_slope": 0,
-                "texture": "teksture/mesec.bmp"
-             }
+            "satellites": [
+                {
+                    "name": "moon",
+                    "radius": 0.2,
+                    "revolution_velocity": 0.1,
+                    "revolution_radius": 5.0,
+                    "rotation_velocity": 0.04,
+                    "slope": 0,
+                    "rotation_slope": 0,
+                    "texture": "teksture/mesec.bmp"
+                 }
+             ]
         },
         {
             "name": "mars",

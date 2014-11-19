@@ -26,15 +26,11 @@ MainWindow::MainWindow()
     aboutAct = new QAction(tr("&About"), this);
     connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
 
-    aboutQtAct = new QAction(tr("About &Qt"), this);
-    connect(aboutQtAct, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
-
     fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->addAction(exitAct);
 
     helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(aboutAct);
-    helpMenu->addAction(aboutQtAct);
 
     QGridLayout *centralLayout = new QGridLayout;
     centralLayout->addWidget(glWidgetArea, 0, 0);

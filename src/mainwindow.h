@@ -27,5 +27,4 @@ private:
     QMenu *helpMenu;
     QAction *exitAct;
     QAction *aboutAct;
-    QAction *aboutQtAct;
 };

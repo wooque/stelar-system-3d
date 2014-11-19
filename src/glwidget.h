@@ -15,12 +15,16 @@ public:
     GLWidget(QWidget *parent = 0);
     ~GLWidget();
 
-protected:
+public slots:
+    void loadConfiguration(QString filename);
+
+private:
     void initializeGL();
     void paintGL();
     void resizeGL(int width, int height);
     void mouseMoveEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *event);
+    bool isInitialise() const;
 
 private slots:
     void advanceTime();

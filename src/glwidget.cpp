@@ -15,6 +15,8 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QFile>
+#include <QFileInfo>
+#include <QDir>
 #include <QString>
 
 // test
@@ -29,9 +31,24 @@ using std::get;
 GLWidget::GLWidget(QWidget *parent)
     : QGLWidget(parent)
 {
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(advanceTime()));
+    timer->start(20);
+
+    setMouseTracking(true);
+    setFocusPolicy(Qt::StrongFocus);
+}
+
+GLWidget::~GLWidget()
+{
+    makeCurrent();
+}
+
+void GLWidget::loadConfiguration(QString filename)
+{
     QString settings;
     QFile file;
-    file.setFileName("../conf.json");
+    file.setFileName(filename);
     file.open(QIODevice::ReadOnly | QIODevice::Text);
     settings = file.readAll();
     file.close();
@@ -40,8 +57,11 @@ GLWidget::GLWidget(QWidget *parent)
     QJsonObject system = systemJson.object();
     QString background = system["background"].toString();
 
+    QFileInfo confInfo(file);
+    QString confDir = confInfo.absolutePath() + QDir::separator();
+
     pozadina = unique_ptr<NebeskoTelo>(new NebeskoTelo(500.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
-                                                       unique_ptr<Tekstura>(new Tekstura(background)), true));
+                                                       unique_ptr<Tekstura>(new Tekstura(confDir + background)), true));
 
     const QString RADIUS = "radius";
     const QString REVOLUTION_VELOCITY = "revolution_velocity";
@@ -66,7 +86,7 @@ GLWidget::GLWidget(QWidget *parent)
                                                         star[SLOPE].toDouble(),
                                                         star[ROTATION_SLOPE].toDouble(),
                                                         0,
-                                                        unique_ptr<Tekstura>(new Tekstura(star[TEXTURE].toString())),
+                                                        unique_ptr<Tekstura>(new Tekstura(confDir + star[TEXTURE].toString())),
                                                         true));
         QJsonArray planets = system["planets"].toArray();
         for(const QJsonValue &planetValue: planets)
@@ -79,13 +99,13 @@ GLWidget::GLWidget(QWidget *parent)
                                                                       planet[SLOPE].toDouble(),
                                                                       planet[ROTATION_SLOPE].toDouble(),
                                                                       200,
-                                                                      unique_ptr<Tekstura>(new Tekstura(planet[TEXTURE].toString()))));
+                                                                      unique_ptr<Tekstura>(new Tekstura(confDir + planet[TEXTURE].toString()))));
             if(!planet[RING].isNull())
             {
                 QJsonObject ring = planet[RING].toObject();
                 new_planet->dodajPrsten(unique_ptr<Prsten>(new Prsten(ring[RING_INNER_RADIUS].toDouble(),
                                                                       ring[RING_OUTTER_RADIUS].toDouble(),
-                                                                      unique_ptr<Tekstura>(new Tekstura(ring[TEXTURE].toString())),
+                                                                      unique_ptr<Tekstura>(new Tekstura(confDir + ring[TEXTURE].toString())),
                                                                       10)));
             }
 
@@ -99,26 +119,18 @@ GLWidget::GLWidget(QWidget *parent)
                                                                                  satellite[SLOPE].toDouble(),
                                                                                  satellite[ROTATION_SLOPE].toDouble(),
                                                                                  200,
-                                                                                 unique_ptr<Tekstura>(new Tekstura(satellite[TEXTURE].toString())))));
+                                                                                 unique_ptr<Tekstura>(new Tekstura(confDir + satellite[TEXTURE].toString())))));
             }
 
             Sunce->dodajSatelit( std::move(new_planet) );
         }
     }
-
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(advanceTime()));
-    timer->start(20);
-
-    setMouseTracking(true);
-    setFocusPolicy(Qt::StrongFocus);
 }
 
-GLWidget::~GLWidget()
+bool GLWidget::isInitialise() const
 {
-    makeCurrent();
+    return (Sunce && pozadina);
 }
-
 void GLWidget::initializeGL()
 {
     GLfloat AmbijentalnoSvetlo[] = { 0.1f, 0.1f, 0.1f, 1.0f };
@@ -145,6 +157,9 @@ void GLWidget::paintGL()
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
+
+    if(!isInitialise())
+        return;
 
     int view_x;
     int view_z;
@@ -210,6 +225,9 @@ void GLWidget::advanceTime()
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
+    if (!isInitialise())
+        return;
+
     int y = event->y();
 
     if(prethodno_y == -1)
@@ -230,30 +248,33 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
 
 void GLWidget::keyPressEvent(QKeyEvent *event)
 {
-  switch (event->key())
-  {
-  case Qt::Key_Escape:
-      QApplication::quit();
-      break;
+    if (!isInitialise())
+        return;
 
-  case Qt::Key_Up :
-      if(planeta < Sunce->broj_satelita() - 1)
-          planeta++;
-      break;
+    switch (event->key())
+    {
+    case Qt::Key_Escape:
+        QApplication::quit();
+        break;
 
-  case Qt::Key_Down:
-      if(planeta >= 0)
-          planeta --;
-      break;
+    case Qt::Key_Up :
+        if(planeta < Sunce->broj_satelita() - 1)
+            planeta++;
+        break;
 
-  case Qt::Key_Left:
-      if (pogled > 0)
-          pogled--;
-      break;
+    case Qt::Key_Down:
+        if(planeta >= 0)
+            planeta --;
+        break;
 
-  case Qt::Key_Right:
-      if (pogled < Sunce->broj_satelita())
-          pogled++;
-      break;
-  }
+    case Qt::Key_Left:
+        if (pogled > 0)
+            pogled--;
+        break;
+
+    case Qt::Key_Right:
+        if (pogled < Sunce->broj_satelita())
+            pogled++;
+        break;
+    }
 }

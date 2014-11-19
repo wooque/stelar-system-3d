@@ -16,6 +16,7 @@ public:
     MainWindow();
 
 private slots:
+    void openConfiguration();
     void about();
 
 private:
@@ -25,6 +26,7 @@ private:
 
     QMenu *fileMenu;
     QMenu *helpMenu;
+    QAction *openSystem;
     QAction *exitAct;
     QAction *aboutAct;
 };

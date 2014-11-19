@@ -1,5 +1,5 @@
 {
-    "background": "../teksture/zvezde.bmp",
+    "background": "teksture/zvezde.bmp",
     "stars": [
         {
             "name": "sun",
@@ -9,7 +9,7 @@
             "rotation_velocity": 0,
             "slope": 0,
             "rotation_slope": 0,
-            "texture": "../teksture/gzvezda.bmp"
+            "texture": "teksture/gzvezda.bmp"
         }
      ],
     "planets": [
@@ -21,7 +21,7 @@
             "rotation_velocity": 0.01,
             "slope": 0,
             "rotation_slope": 0,
-            "texture": "../teksture/merkur.bmp"
+            "texture": "teksture/merkur.bmp"
         },
         {
             "name": "venus",
@@ -31,7 +31,7 @@
             "rotation_velocity": 0.02,
             "slope": 0,
             "rotation_slope": 30,
-            "texture": "../teksture/venera.bmp"
+            "texture": "teksture/venera.bmp"
         },
         {
             "name": "earth",
@@ -41,7 +41,7 @@
             "rotation_velocity": 0.03,
             "slope": 23.5,
             "rotation_slope": 0,
-            "texture": "../teksture/zemlja.bmp",
+            "texture": "teksture/zemlja.bmp",
             "satellite": {
                 "name": "moon",
                 "radius": 0.2,
@@ -50,7 +50,7 @@
                 "rotation_velocity": 0.04,
                 "slope": 0,
                 "rotation_slope": 0,
-                "texture": "../teksture/mesec.bmp"
+                "texture": "teksture/mesec.bmp"
              }
         },
         {
@@ -61,7 +61,7 @@
             "rotation_velocity": 0.05,
             "slope": 0,
             "rotation_slope": 0,
-            "texture": "../teksture/mars.bmp"
+            "texture": "teksture/mars.bmp"
         },
         {
             "name": "jupiter",
@@ -71,7 +71,7 @@
             "rotation_velocity": 0.06,
             "slope": 60,
             "rotation_slope": 0,
-            "texture": "../teksture/jupiter.bmp"
+            "texture": "teksture/jupiter.bmp"
         },
         {
             "name": "saturn",
@@ -81,11 +81,11 @@
             "rotation_velocity": 0.07,
             "slope": 0,
             "rotation_slope": 0,
-            "texture": "../teksture/saturn.bmp",
+            "texture": "teksture/saturn.bmp",
             "ring": {
                 "inner_radius": 1.5,
                 "outter_radius": 2.5,
-                "texture": "../teksture/saturn-prsten.bmp"
+                "texture": "teksture/saturn-prsten.bmp"
              }
         },
         {
@@ -96,7 +96,7 @@
             "rotation_velocity": 0.08,
             "slope": 98,
             "rotation_slope": 0,
-            "texture": "../teksture/uran.bmp"
+            "texture": "teksture/uran.bmp"
         },
         {
             "name": "neptune",
@@ -106,7 +106,7 @@
             "rotation_velocity": 0.09,
             "slope": 0,
             "rotation_slope": 10,
-            "texture": "../teksture/neptun.bmp"
+            "texture": "teksture/neptun.bmp"
         }
     ]
 }

@@ -19,6 +19,10 @@ MainWindow::MainWindow()
     glWidgetArea->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     glWidgetArea->setMinimumSize(50, 50);
 
+    openSystem = new QAction(tr("&Open system"), this);
+    openSystem->setShortcut(QKeySequence::Open);
+    connect(openSystem, SIGNAL(triggered()), this, SLOT(openConfiguration()));
+
     exitAct = new QAction(tr("E&xit"), this);
     exitAct->setShortcuts(QKeySequence::Quit);
     connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
@@ -27,6 +31,8 @@ MainWindow::MainWindow()
     connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
 
     fileMenu = menuBar()->addMenu(tr("&File"));
+    fileMenu->addAction(openSystem);
+    fileMenu->addSeparator();
     fileMenu->addAction(exitAct);
 
     helpMenu = menuBar()->addMenu(tr("&Help"));
@@ -38,6 +44,17 @@ MainWindow::MainWindow()
 
     setWindowTitle(tr("Planetarium"));
     resize(1024, 600);
+}
+
+void MainWindow::openConfiguration()
+{
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                                    tr("Open System"),
+                                                    QString(),
+                                                    tr("Configurations (*.json)"));
+    if (!fileName.isEmpty()) {
+        glWidget->loadConfiguration(fileName);
+    }
 }
 
 void MainWindow::about()

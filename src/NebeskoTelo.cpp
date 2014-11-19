@@ -104,7 +104,7 @@ void NebeskoTelo::crtaj() const
 
     glDisable(GL_LIGHTING);
     glPushMatrix();
-    glLineWidth(2);
+    glLineWidth(1);
     glColor3f(1, 1, 1);
     glBegin(GL_LINE_STRIP);
     for (unsigned i = 0; i < segmenti.size(); i++)
@@ -171,7 +171,7 @@ void NebeskoTelo::crtajTelo() const
     if( ugao_rotacije > 0)
         glRotated(ugao_rotacije, 0, 1, 0);
 
-    crtajSferu( 1, 5 );
+    crtajSferu( 1, 9 );
 
     if (prsten)
         prsten->crtajPrsten();

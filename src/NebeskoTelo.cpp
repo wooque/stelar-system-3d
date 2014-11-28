@@ -187,6 +187,14 @@ void NebeskoTelo::crtajTelo() const
     glPopMatrix();
 }
 
+void NebeskoTelo::crtajSvetlo() const
+{
+    if(!svetlo)
+        return;
+
+    svetlo->crtajSvetlo(0.0f, 0.0f, 0.0f);
+}
+
 void Prsten::crtajPrsten() const
 {
     glDisable(GL_LIGHTING);
@@ -206,4 +214,12 @@ void Prsten::crtajPrsten() const
     }
     glEnd();
 //    glEnable(GL_DEPTH);
+}
+
+void Svetlo::crtajSvetlo(float x, float y, float z) const
+{
+    GLfloat DifuznoSvetlo[] = { red, green, blue, 1.0f };
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, DifuznoSvetlo);
+    GLfloat PozicijaSvetla[] = { x, y, z, 1.0f };
+    glLightfv(GL_LIGHT1, GL_POSITION, PozicijaSvetla);
 }

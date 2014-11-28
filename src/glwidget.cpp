@@ -87,7 +87,7 @@ void GLWidget::loadConfiguration(QString filename)
                                                                 star[ROTATION_VELOCITY].toDouble(),
                                                                 star[SLOPE].toDouble(),
                                                                 star[ROTATION_SLOPE].toDouble(),
-                                                                0,
+                                                                50,
                                                                 unique_ptr<Tekstura>(new Tekstura(confDir + star[TEXTURE].toString())),
                                                                 true)));
     }

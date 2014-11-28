@@ -3,13 +3,23 @@
     "stars": [
         {
             "name": "sun",
-            "radius": 12,
-            "revolution_velocity": 0,
-            "revolution_radius": 0,
-            "rotation_velocity": 0,
+            "radius": 3,
+            "revolution_velocity": 0.03,
+            "revolution_radius": 2,
+            "rotation_velocity": 0.05,
             "slope": 0,
             "rotation_slope": 0,
             "texture": "teksture/gzvezda.bmp"
+        },
+        {
+            "name": "other sun",
+            "radius": 5,
+            "revolution_velocity": 0.1,
+            "revolution_radius": 10,
+            "rotation_velocity": 0.1,
+            "slope": 0,
+            "rotation_slope": 0,
+            "texture": "teksture/mesec.bmp"
         }
      ],
     "planets": [

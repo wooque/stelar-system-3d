@@ -12,10 +12,10 @@ const float RAD_PER_DEG = M_PI/180;
 class Prsten
 {
 private:
-    float unut_r;
-    float spolj_r;
-    std::unique_ptr<Tekstura> tex_prsten;
-    float prsten_n;
+    float                       unut_r;
+    float                       spolj_r;
+    std::unique_ptr<Tekstura>   tex_prsten;
+    float                       prsten_n;
 
 public:
     Prsten(float arg_unut_r,
@@ -32,6 +32,26 @@ public:
     void crtajPrsten() const;
 };
 
+class Svetlo
+{
+public:
+    float   red;
+    float   green;
+    float   blue;
+
+public:
+    Svetlo(float arg_red,
+           float arg_green,
+           float arg_blue)
+        : red(arg_red),
+          green(arg_green),
+          blue(arg_blue) {}
+
+    ~Svetlo() {}
+
+    void crtajSvetlo(float x, float y, float z) const;
+};
+
 class NebeskoTelo
 {
 private:
@@ -45,13 +65,11 @@ private:
     float                                       nagib;
     float                                       nagib_ravni;
     std::deque<float>                           segmenti;
-    GLfloat                                     red;
-    GLfloat                                     green;
-    GLfloat                                     blue;
     unsigned                                    kapacitet;
     std::vector<std::unique_ptr<NebeskoTelo>>   sateliti;
     bool                                        is_star;
     std::unique_ptr<Prsten>                     prsten;
+    std::unique_ptr<Svetlo>                     svetlo;
 
 public:
     NebeskoTelo( float arg_poluprecnik,
@@ -63,7 +81,8 @@ public:
                  int broj_segmenata,
                  std::unique_ptr<Tekstura> t,
                  bool arg_is_star = false,
-                 std::unique_ptr<Prsten> p = nullptr)
+                 std::unique_ptr<Prsten> p = nullptr,
+                 std::unique_ptr<Svetlo> s = nullptr)
         : tekstura(std::move(t)),
           poluprecnik(arg_poluprecnik),
           ugao_revolucije(0),
@@ -76,7 +95,8 @@ public:
           segmenti(),
           kapacitet(broj_segmenata),
           is_star(arg_is_star),
-          prsten(std::move(p))
+          prsten(std::move(p)),
+          svetlo(std::move(s))
     {}
 
     ~NebeskoTelo() {}
@@ -101,6 +121,8 @@ public:
     {
         prsten = std::move(arg_prsten);
     }
+
+    void crtajSvetlo() const;
 
     std::pair<float, float> getPos() const;
 };

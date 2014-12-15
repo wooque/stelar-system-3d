@@ -102,7 +102,7 @@ void GLWidget::loadConfiguration(QString filename)
                                                                   planet[ROTATION_VELOCITY].toDouble(),
                                                                   planet[SLOPE].toDouble(),
                                                                   planet[ROTATION_SLOPE].toDouble(),
-                                                                  150,
+                                                                  200,
                                                                   unique_ptr<Tekstura>(new Tekstura(confDir + planet[TEXTURE].toString()))));
         if(!planet[RING].isNull())
         {

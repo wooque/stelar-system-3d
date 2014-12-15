@@ -117,6 +117,7 @@ void NebeskoTelo::crtaj() const
     }
     glEnd();
     glPopMatrix();
+    glEnable(GL_LIGHTING);
 
     if( tekstura )
         tekstura->primeniTeksturu();

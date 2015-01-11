@@ -3,7 +3,6 @@
 #include "Tekstura.h"
 #include "NebeskoTelo.h"
 
-#include <cmath>
 #include <chrono>
 
 #include <GL/gl.h>
@@ -277,7 +276,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         QApplication::quit();
         break;
 
-    case Qt::Key_Up :
+    case Qt::Key_Up:
         if(planeta < (int)planets.size() - 1)
             planeta++;
         break;

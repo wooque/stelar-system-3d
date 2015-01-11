@@ -1,11 +1,11 @@
 #pragma once
 
 #include "Tekstura.h"
-
 #include <deque>
 #include <memory>
 #include <vector>
 #include <utility>
+#include <cmath>
 
 const float RAD_PER_DEG = M_PI/180;
 

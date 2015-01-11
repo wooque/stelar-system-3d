@@ -250,6 +250,9 @@ void GLWidget::resizeGL(int width, int height)
     gluPerspective(60, (GLfloat)width/(GLfloat)height, 1, 1200);
 
     glMatrixMode(GL_MODELVIEW);
+
+    middle_x = width/2;
+    middle_y = height/2;
 }
 
 void GLWidget::advanceTime()
@@ -263,21 +266,10 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
         return;
 
     int y = event->y();
+    int x = event->x();
 
-    if(prethodno_y == -1)
-    {
-        prethodno_y = y;
-        return;
-    }
-
-    int temp = y - prethodno_y;
-
-    if(temp > 0)
-        visina++;
-    if(temp < 0)
-        visina--;
-
-    prethodno_y = y;
+    visina = START_VISINA + y - middle_y;
+    sirina = START_SIRINA + x - middle_x;
 }
 
 void GLWidget::keyPressEvent(QKeyEvent *event)

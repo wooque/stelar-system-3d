@@ -40,6 +40,10 @@ private:
 
     int pogled = 0;
     int visina = 40;
+    static const int START_VISINA = 40;
+    int sirina = 0;
+    static const int START_SIRINA = 0;
     int planeta = -1;
-    int prethodno_y = -1;
+    int middle_x = 0;
+    int middle_y = 0;
 };

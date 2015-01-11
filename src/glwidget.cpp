@@ -3,8 +3,6 @@
 #include "Tekstura.h"
 #include "NebeskoTelo.h"
 
-#include <chrono>
-
 #include <GL/gl.h>
 #include <GL/glu.h>
 
@@ -26,10 +24,13 @@ using std::chrono::duration_cast;
 using std::chrono::milliseconds;
 using std::unique_ptr;
 using std::get;
+using std::make_unique;
 
 GLWidget::GLWidget(QWidget *parent)
     : QGLWidget(parent)
 {
+    prethodno_vreme = system_clock::time_point::min();
+
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(advanceTime()));
     timer->start(20);
@@ -59,8 +60,8 @@ void GLWidget::loadConfiguration(QString filename)
     QFileInfo confInfo(file);
     QString confDir = confInfo.absolutePath() + QDir::separator();
 
-    pozadina = unique_ptr<NebeskoTelo>(new NebeskoTelo(500.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
-                                                       unique_ptr<Tekstura>(new Tekstura(confDir + background)), true));
+    pozadina = make_unique<NebeskoTelo>(500.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
+                                        make_unique<Tekstura>(confDir + background), true);
 
     const QString STARS = "stars";
     const QString PLANETS = "planets";
@@ -80,36 +81,45 @@ void GLWidget::loadConfiguration(QString filename)
     for(const QJsonValue &starValue: starsArray)
     {
         QJsonObject star = starValue.toObject();
-        stars.push_back(unique_ptr<NebeskoTelo>(new NebeskoTelo(star[RADIUS].toDouble(),
-                                                                star[REVOLUTION_VELOCITY].toDouble(),
-                                                                star[REVOLUTION_RADIUS].toDouble(),
-                                                                star[ROTATION_VELOCITY].toDouble(),
-                                                                star[SLOPE].toDouble(),
-                                                                star[ROTATION_SLOPE].toDouble(),
-                                                                50,
-                                                                unique_ptr<Tekstura>(new Tekstura(confDir + star[TEXTURE].toString())),
-                                                                true)));
+        stars.push_back(make_unique<NebeskoTelo>(
+                            star[RADIUS].toDouble(),
+                            star[REVOLUTION_VELOCITY].toDouble(),
+                            star[REVOLUTION_RADIUS].toDouble(),
+                            star[ROTATION_VELOCITY].toDouble(),
+                            star[SLOPE].toDouble(),
+                            star[ROTATION_SLOPE].toDouble(),
+                            50,
+                            make_unique<Tekstura>(confDir + star[TEXTURE].toString()),
+                            true
+                            )
+                        );
     }
 
     QJsonArray planetsArray = system[PLANETS].toArray();
     for(const QJsonValue &planetValue: planetsArray)
     {
         QJsonObject planet = planetValue.toObject();
-        auto new_planet = unique_ptr<NebeskoTelo>(new NebeskoTelo(planet[RADIUS].toDouble(),
-                                                                  planet[REVOLUTION_VELOCITY].toDouble(),
-                                                                  planet[REVOLUTION_RADIUS].toDouble(),
-                                                                  planet[ROTATION_VELOCITY].toDouble(),
-                                                                  planet[SLOPE].toDouble(),
-                                                                  planet[ROTATION_SLOPE].toDouble(),
-                                                                  200,
-                                                                  unique_ptr<Tekstura>(new Tekstura(confDir + planet[TEXTURE].toString()))));
+        auto new_planet = make_unique<NebeskoTelo>(
+                            planet[RADIUS].toDouble(),
+                            planet[REVOLUTION_VELOCITY].toDouble(),
+                            planet[REVOLUTION_RADIUS].toDouble(),
+                            planet[ROTATION_VELOCITY].toDouble(),
+                            planet[SLOPE].toDouble(),
+                            planet[ROTATION_SLOPE].toDouble(),
+                            200,
+                            make_unique<Tekstura>(confDir + planet[TEXTURE].toString())
+                          );
+
         if(!planet[RING].isNull())
         {
             QJsonObject ring = planet[RING].toObject();
-            new_planet->dodajPrsten(unique_ptr<Prsten>(new Prsten(ring[RING_INNER_RADIUS].toDouble(),
-                                                                  ring[RING_OUTTER_RADIUS].toDouble(),
-                                                                  unique_ptr<Tekstura>(new Tekstura(confDir + ring[TEXTURE].toString())),
-                                                                  10)));
+            new_planet->dodajPrsten(make_unique<Prsten>(
+                                        ring[RING_INNER_RADIUS].toDouble(),
+                                        ring[RING_OUTTER_RADIUS].toDouble(),
+                                        make_unique<Tekstura>(confDir + ring[TEXTURE].toString()),
+                                        10
+                                        )
+                                    );
         }
 
         if(!planet[SATELLITES].isNull())
@@ -118,14 +128,19 @@ void GLWidget::loadConfiguration(QString filename)
             for(const QJsonValue &satelliteValue: satellites)
             {
                 QJsonObject satellite = satelliteValue.toObject();
-                new_planet->dodajSatelit(unique_ptr<NebeskoTelo>(new NebeskoTelo(satellite[RADIUS].toDouble(),
-                                                                                 satellite[REVOLUTION_VELOCITY].toDouble(),
-                                                                                 satellite[REVOLUTION_RADIUS].toDouble(),
-                                                                                 satellite[ROTATION_VELOCITY].toDouble(),
-                                                                                 satellite[SLOPE].toDouble(),
-                                                                                 satellite[ROTATION_SLOPE].toDouble(),
-                                                                                 50,
-                                                                                 unique_ptr<Tekstura>(new Tekstura(confDir + satellite[TEXTURE].toString())))));
+                new_planet->dodajSatelit(make_unique<NebeskoTelo>(
+                                             satellite[RADIUS].toDouble(),
+                                             satellite[REVOLUTION_VELOCITY].toDouble(),
+                                             satellite[REVOLUTION_RADIUS].toDouble(),
+                                             satellite[ROTATION_VELOCITY].toDouble(),
+                                             satellite[SLOPE].toDouble(),
+                                             satellite[ROTATION_SLOPE].toDouble(),
+                                             50,
+                                             make_unique<Tekstura>(
+                                                 confDir + satellite[TEXTURE].toString()
+                                             )
+                                             )
+                                         );
             }
         }
 
@@ -201,24 +216,24 @@ void GLWidget::paintGL()
 
     glLightfv(GL_LIGHT1, GL_POSITION, PozicijaSvetla);
 
-    long proteklo = 0;
-    if( prethodno_vreme != 0 )
-        proteklo = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() - prethodno_vreme;
+    milliseconds proteklo = milliseconds::zero();
+    if( prethodno_vreme != system_clock::time_point::min() )
+        proteklo = duration_cast<milliseconds>(system_clock::now() - prethodno_vreme);
     else
-        prethodno_vreme = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+        prethodno_vreme = system_clock::now();
 
     pozadina->crtaj();
 
     for(const auto &star: stars)
     {
         star->crtaj();
-        star->pomeri(proteklo);
+        star->pomeri(proteklo.count());
     }
 
     for(const auto &planet: planets)
     {
         planet->crtaj();
-        planet->pomeri(proteklo);
+        planet->pomeri(proteklo.count());
     }
 
     prethodno_vreme += proteklo;

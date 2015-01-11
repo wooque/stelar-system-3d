@@ -5,6 +5,7 @@
 #include <QKeyEvent>
 #include <vector>
 #include <memory>
+#include <chrono>
 
 #include "NebeskoTelo.h"
 
@@ -35,7 +36,7 @@ private:
     std::vector<std::unique_ptr<NebeskoTelo>> stars;
     std::vector<std::unique_ptr<NebeskoTelo>> planets;
 
-    long  prethodno_vreme = 0;
+    std::chrono::system_clock::time_point prethodno_vreme;
 
     int pogled = 0;
     int visina = 40;

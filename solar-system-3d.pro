@@ -2,7 +2,7 @@ QT += core gui opengl widgets
 
 INCLUDEPATH += src
 LIBS += -lGLU
-CONFIG += c++11
+CONFIG += c++14
 
 TARGET = solar-system-3d
 TEMPLATE = app

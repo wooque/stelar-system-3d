@@ -16,6 +16,8 @@
 #include <QDir>
 #include <QString>
 
+#include <string>
+
 // test
 #include <iostream>
 using std::cout;
@@ -28,6 +30,7 @@ using std::chrono::milliseconds;
 using std::unique_ptr;
 using std::get;
 using std::make_unique;
+using std::to_string;
 
 GLWidget::GLWidget(QWidget *parent)
     : QGLWidget(parent)
@@ -151,10 +154,21 @@ void GLWidget::loadConfiguration(QString filename)
     }
 }
 
+std::string GLWidget::view_to_string(view_modes mode)
+{
+    switch (mode) {
+    case view_modes::AXIS:   return "AXIS"; break;
+    case view_modes::SPHERE: return "SPHERE"; break;
+    case view_modes::CENTER: return "CENTER"; break;
+    default:                 return ""; break;
+    }
+}
+
 bool GLWidget::isInitialise() const
 {
     return (pozadina && !stars.empty() && !planets.empty());
 }
+
 void GLWidget::initializeGL()
 {
     GLfloat AmbijentalnoSvetlo[] = { 0.1f, 0.1f, 0.1f, 1.0f };
@@ -188,6 +202,7 @@ void GLWidget::paintGL()
     if(!isInitialise())
         return;
 
+    // looking-at body
     double view_x;
     double view_z;
 
@@ -203,6 +218,7 @@ void GLWidget::paintGL()
         view_z = get<1>(temp);
     }
 
+    // referent body
     double pos_x;
     double pos_z;
 
@@ -218,6 +234,7 @@ void GLWidget::paintGL()
         pos_z = 30;
     }
 
+    // view modes
     double pos_y;
     int x_diff;
     int y_diff;
@@ -254,6 +271,7 @@ void GLWidget::paintGL()
 
     glLightfv(GL_LIGHT1, GL_POSITION, PozicijaSvetla);
 
+    // advancing time
     milliseconds proteklo = milliseconds::zero();
     if( prethodno_vreme != system_clock::time_point::min() )
         proteklo = duration_cast<milliseconds>(system_clock::now() - prethodno_vreme);
@@ -279,6 +297,19 @@ void GLWidget::paintGL()
     }
 
     prethodno_vreme += proteklo;
+
+    glPushMatrix();
+    glLoadIdentity();
+    gluPerspective(60, (GLfloat)win_width/(GLfloat)win_height, 1, 1200);
+    glDisable(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
+    qglColor(Qt::white);
+    renderText(-2.1, 0.60, 0.0, QString::fromStdString("View body: " + to_string(pogled)), QFont("Arial", 12));
+    renderText(-2.1, 0.55, 0.0, QString::fromStdString("Referent body: " + to_string(planeta)), QFont("Arial", 12));
+    renderText(-2.1, 0.50, 0.0, QString::fromStdString("View mode: " + view_to_string(view_mode)), QFont("Arial", 12));
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
+    glPopMatrix();
 
 //    glFinish();
 }

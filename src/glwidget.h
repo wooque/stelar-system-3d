@@ -9,6 +9,8 @@
 
 #include "NebeskoTelo.h"
 
+enum class view_modes {AXIS, SPHERE, CENTER};
+
 class GLWidget : public QGLWidget
 {
     Q_OBJECT
@@ -27,6 +29,7 @@ private:
     void mouseMoveEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *event);
     bool isInitialise() const;
+    static std::string view_to_string(view_modes mode);
 
 private slots:
     void advanceTime();
@@ -44,7 +47,6 @@ private:
 
     int pogled = 0;
     int planeta = -1;
-    enum class view_modes {AXIS, SPHERE, CENTER};
     view_modes view_mode = view_modes::AXIS;
 
     float scale_x = 0.0f;

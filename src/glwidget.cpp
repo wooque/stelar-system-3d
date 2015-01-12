@@ -232,18 +232,17 @@ void GLWidget::paintGL()
         break;
 
     case view_modes::SPHERE:
+        //TODO: need refining
         pos_y = 0.25 * UNIV_R;
         y_diff = cos(RAD_PER_DEG*scale_y*360) * 0.25 * UNIV_R;
         r_diff = sin(RAD_PER_DEG*scale_y*360) * 0.25 * UNIV_R;
         x_diff = sin(RAD_PER_DEG*scale_x*360) * r_diff;
         z_diff = cos(RAD_PER_DEG*scale_x*360) * r_diff;
-        gluLookAt(pos_x + x_diff, pos_y + y_diff, pos_z + z_diff, view_x, 0, view_z, 0, 1, 0);
+        gluLookAt(pos_x + x_diff, y_diff, pos_z + z_diff, view_x, 0, view_z, 0, 1, 0);
         break;
 
     case view_modes::CENTER:
-        // TODO
-        pos_y = scale_y * 0.98 * UNIV_R;
-        gluLookAt(pos_x, pos_y, pos_z, view_x, 0, view_z, 0, 1, 0);
+        gluLookAt(pos_x, 0.0, pos_z, view_x, 0, view_z, 0, 1, 0);
         break;
 
     default:
@@ -269,9 +268,13 @@ void GLWidget::paintGL()
         star->pomeri(proteklo.count());
     }
 
-    for(const auto &planet: planets)
+    for(unsigned i = 0; i < planets.size(); i++)
     {
-        planet->crtaj();
+        const auto &planet = planets[i];
+        if (view_mode != view_modes::CENTER || planeta != (int)i)
+        {
+            planet->crtaj();
+        }
         planet->pomeri(proteklo.count());
     }
 

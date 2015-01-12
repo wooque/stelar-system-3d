@@ -18,6 +18,9 @@
 
 // test
 #include <iostream>
+using std::cout;
+using std::endl;
+//
 
 using std::chrono::system_clock;
 using std::chrono::duration_cast;
@@ -60,7 +63,7 @@ void GLWidget::loadConfiguration(QString filename)
     QFileInfo confInfo(file);
     QString confDir = confInfo.absolutePath() + QDir::separator();
 
-    pozadina = make_unique<NebeskoTelo>(500.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
+    pozadina = make_unique<NebeskoTelo>(UNIV_R, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
                                         make_unique<Tekstura>(confDir + background), true);
 
     const QString STARS = "stars";
@@ -177,7 +180,7 @@ void GLWidget::initializeGL()
 
 void GLWidget::paintGL()
 {
-    GLfloat PozicijaSvetla[] =     { 0.0f, 0.0f, 0.0f, 1.0f };
+    GLfloat PozicijaSvetla[] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
@@ -187,6 +190,7 @@ void GLWidget::paintGL()
 
     double view_x;
     double view_z;
+
     if(pogled == 0)
     {
         view_x = 0;
@@ -199,8 +203,9 @@ void GLWidget::paintGL()
         view_z = get<1>(temp);
     }
 
-    int pos_x;
-    int pos_z;
+    double pos_x;
+    double pos_z;
+
     if(planeta != -1)
     {
         auto temp = planets.at(planeta)->getPos();
@@ -212,7 +217,41 @@ void GLWidget::paintGL()
         pos_x = -70;
         pos_z = 30;
     }
-    gluLookAt(pos_x, visina, pos_z, view_x, 0, view_z, 0, 1, 0);
+
+    double pos_y;
+    int x_diff;
+    int y_diff;
+    int z_diff;
+    int r_diff;
+
+    switch (view_mode)
+    {
+    case view_modes::AXIS:
+        pos_y = scale_y * 0.98 * UNIV_R;
+        gluLookAt(pos_x, pos_y, pos_z, view_x, 0, view_z, 0, 1, 0);
+        break;
+
+    case view_modes::SPHERE:
+        pos_y = 0.25 * UNIV_R;
+        y_diff = cos(RAD_PER_DEG*scale_y*360) * 0.25 * UNIV_R;
+        r_diff = sin(RAD_PER_DEG*scale_y*360) * 0.25 * UNIV_R;
+        x_diff = sin(RAD_PER_DEG*scale_x*360) * r_diff;
+        z_diff = cos(RAD_PER_DEG*scale_x*360) * r_diff;
+        gluLookAt(pos_x + x_diff, pos_y + y_diff, pos_z + z_diff, view_x, 0, view_z, 0, 1, 0);
+        break;
+
+    case view_modes::CENTER:
+        // TODO
+        pos_y = scale_y * 0.98 * UNIV_R;
+        gluLookAt(pos_x, pos_y, pos_z, view_x, 0, view_z, 0, 1, 0);
+        break;
+
+    default:
+        // default to AXIS
+        pos_y = scale_y * 0.98 * UNIV_R;
+        gluLookAt(pos_x, pos_y, pos_z, view_x, 0, view_z, 0, 1, 0);
+        break;
+    }
 
     glLightfv(GL_LIGHT1, GL_POSITION, PozicijaSvetla);
 
@@ -251,8 +290,8 @@ void GLWidget::resizeGL(int width, int height)
 
     glMatrixMode(GL_MODELVIEW);
 
-    middle_x = width/2;
-    middle_y = height/2;
+    win_width = width;
+    win_height = height;
 }
 
 void GLWidget::advanceTime()
@@ -265,11 +304,11 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     if (!isInitialise())
         return;
 
-    int y = event->y();
     int x = event->x();
+    int y = event->y();
 
-    visina = START_VISINA + y - middle_y;
-    sirina = START_SIRINA + x - middle_x;
+    scale_x = ((float)(x - win_width/2))/win_width;
+    scale_y = ((float)(y - win_height/2))/win_height;
 }
 
 void GLWidget::keyPressEvent(QKeyEvent *event)
@@ -301,6 +340,21 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Right:
         if (pogled < (int)planets.size())
             pogled++;
+        break;
+
+    case Qt::Key_1:
+        view_mode = view_modes::AXIS;
+        break;
+
+    case Qt::Key_2:
+        view_mode = view_modes::SPHERE;
+        break;
+
+    case Qt::Key_3:
+        view_mode = view_modes::CENTER;
+        break;
+
+    default:
         break;
     }
 }

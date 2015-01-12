@@ -38,12 +38,15 @@ private:
 
     std::chrono::system_clock::time_point prethodno_vreme;
 
+    int win_width = 0;
+    int win_height = 0;
+    const float UNIV_R = 500.0f;
+
     int pogled = 0;
-    int visina = 40;
-    static const int START_VISINA = 40;
-    int sirina = 0;
-    static const int START_SIRINA = 0;
     int planeta = -1;
-    int middle_x = 0;
-    int middle_y = 0;
+    enum class view_modes {AXIS, SPHERE, CENTER};
+    view_modes view_mode = view_modes::AXIS;
+
+    float scale_x = 0.0f;
+    float scale_y = 0.0f;
 };

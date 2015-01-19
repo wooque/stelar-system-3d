@@ -11,7 +11,6 @@
 #include <QTimer>
 #include <QApplication>
 #include <QJsonDocument>
-#include <QJsonObject>
 #include <QJsonArray>
 #include <QFile>
 #include <QFileInfo>
@@ -34,6 +33,26 @@ using std::make_unique;
 using std::to_string;
 using std::string;
 
+const QString GLWidget::BACKGROUND = "background";
+const QString GLWidget::LIGHTING = "lighting";
+const QString GLWidget::AMBIENT = "ambient";
+const QString GLWidget::DIFUSE = "difuse";
+const QString GLWidget::POSITION = "position";
+const QString GLWidget::STARS = "stars";
+const QString GLWidget::PLANETS = "planets";
+const QString GLWidget::NAME = "name";
+const QString GLWidget::RADIUS = "radius";
+const QString GLWidget::REVOLUTION_VELOCITY = "revolution_velocity";
+const QString GLWidget::REVOLUTION_RADIUS = "revolution_radius";
+const QString GLWidget::ROTATION_VELOCITY = "rotation_velocity";
+const QString GLWidget::SLOPE = "slope";
+const QString GLWidget::ROTATION_SLOPE = "rotation_slope";
+const QString GLWidget::TEXTURE = "texture";
+const QString GLWidget::RING = "ring";
+const QString GLWidget::RING_INNER_RADIUS = "inner_radius";
+const QString GLWidget::RING_OUTTER_RADIUS = "outter_radius";
+const QString GLWidget::SATELLITES = "satellites";
+
 GLWidget::GLWidget(QWidget *parent)
     : QGLWidget(parent)
 {
@@ -52,6 +71,36 @@ GLWidget::~GLWidget()
     makeCurrent();
 }
 
+void GLWidget::loadLightingData(float *lighting, const QJsonObject &data, const QString &type)
+{
+    QJsonArray lightingArray = data[type].toArray();
+    int i = 0;
+    for(const QJsonValue &lightingComponent: lightingArray)
+    {
+        float component = lightingComponent.toDouble();
+        lighting[i++] = component;
+    }
+}
+
+unique_ptr<NebeskoTelo> GLWidget::loadStelarBody(const QString &conf_dir,
+                                                 const QJsonObject &data,
+                                                 bool is_star,
+                                                 int trail_length)
+{
+    return make_unique<NebeskoTelo>(
+                data[NAME].toString().toStdString(),
+                data[RADIUS].toDouble(),
+                data[REVOLUTION_VELOCITY].toDouble(),
+                data[REVOLUTION_RADIUS].toDouble(),
+                data[ROTATION_VELOCITY].toDouble(),
+                data[SLOPE].toDouble(),
+                data[ROTATION_SLOPE].toDouble(),
+                trail_length,
+                make_unique<Tekstura>(conf_dir + data[TEXTURE].toString()),
+                is_star
+                );
+}
+
 void GLWidget::loadConfiguration(QString filename)
 {
     QString settings;
@@ -61,65 +110,33 @@ void GLWidget::loadConfiguration(QString filename)
     settings = file.readAll();
     file.close();
 
-    QJsonDocument systemJson = QJsonDocument::fromJson(settings.toUtf8());
-    QJsonObject system = systemJson.object();
-    QString background = system["background"].toString();
-
     QFileInfo confInfo(file);
     QString confDir = confInfo.absolutePath() + QDir::separator();
 
+    QJsonDocument systemJson = QJsonDocument::fromJson(settings.toUtf8());
+    QJsonObject system = systemJson.object();
+
+    QJsonObject lightingData = system[LIGHTING].toObject();
+    loadLightingData(ambient, lightingData, AMBIENT);
+    loadLightingData(difuse, lightingData, DIFUSE);
+    loadLightingData(position, lightingData, POSITION);
+
+    QString background = system[BACKGROUND].toString();
     pozadina = make_unique<NebeskoTelo>("", 2*UNIV_R, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
                                         make_unique<Tekstura>(confDir + background), true);
-
-    static const QString STARS = "stars";
-    static const QString PLANETS = "planets";
-    static const QString NAME = "name";
-    static const QString RADIUS = "radius";
-    static const QString REVOLUTION_VELOCITY = "revolution_velocity";
-    static const QString REVOLUTION_RADIUS = "revolution_radius";
-    static const QString ROTATION_VELOCITY = "rotation_velocity";
-    static const QString SLOPE = "slope";
-    static const QString ROTATION_SLOPE = "rotation_slope";
-    static const QString TEXTURE = "texture";
-    static const QString RING = "ring";
-    static const QString RING_INNER_RADIUS = "inner_radius";
-    static const QString RING_OUTTER_RADIUS = "outter_radius";
-    static const QString SATELLITES = "satellites";
 
     QJsonArray starsArray = system[STARS].toArray();
     for(const QJsonValue &starValue: starsArray)
     {
         QJsonObject star = starValue.toObject();
-        stars.push_back(make_unique<NebeskoTelo>(
-                            star[NAME].toString().toStdString(),
-                            star[RADIUS].toDouble(),
-                            star[REVOLUTION_VELOCITY].toDouble(),
-                            star[REVOLUTION_RADIUS].toDouble(),
-                            star[ROTATION_VELOCITY].toDouble(),
-                            star[SLOPE].toDouble(),
-                            star[ROTATION_SLOPE].toDouble(),
-                            50,
-                            make_unique<Tekstura>(confDir + star[TEXTURE].toString()),
-                            true
-                            )
-                        );
+        stars.push_back(loadStelarBody(confDir, star, true, 50));
     }
 
     QJsonArray planetsArray = system[PLANETS].toArray();
     for(const QJsonValue &planetValue: planetsArray)
     {
         QJsonObject planet = planetValue.toObject();
-        auto new_planet = make_unique<NebeskoTelo>(
-                            planet[NAME].toString().toStdString(),
-                            planet[RADIUS].toDouble(),
-                            planet[REVOLUTION_VELOCITY].toDouble(),
-                            planet[REVOLUTION_RADIUS].toDouble(),
-                            planet[ROTATION_VELOCITY].toDouble(),
-                            planet[SLOPE].toDouble(),
-                            planet[ROTATION_SLOPE].toDouble(),
-                            200,
-                            make_unique<Tekstura>(confDir + planet[TEXTURE].toString())
-                          );
+        auto new_planet = loadStelarBody(confDir, planet, false, 200);
 
         if(!planet[RING].isNull())
         {
@@ -139,25 +156,13 @@ void GLWidget::loadConfiguration(QString filename)
             for(const QJsonValue &satelliteValue: satellites)
             {
                 QJsonObject satellite = satelliteValue.toObject();
-                new_planet->dodajSatelit(make_unique<NebeskoTelo>(
-                                             satellite[NAME].toString().toStdString(),
-                                             satellite[RADIUS].toDouble(),
-                                             satellite[REVOLUTION_VELOCITY].toDouble(),
-                                             satellite[REVOLUTION_RADIUS].toDouble(),
-                                             satellite[ROTATION_VELOCITY].toDouble(),
-                                             satellite[SLOPE].toDouble(),
-                                             satellite[ROTATION_SLOPE].toDouble(),
-                                             50,
-                                             make_unique<Tekstura>(
-                                                 confDir + satellite[TEXTURE].toString()
-                                             )
-                                             )
-                                         );
+                new_planet->dodajSatelit(loadStelarBody(confDir, satellite, false, 50));
             }
         }
 
         planets.push_back( std::move(new_planet) );
     }
+    initializeGL();
 }
 
 std::string GLWidget::view_to_string(view_modes mode)
@@ -177,8 +182,8 @@ bool GLWidget::isInitialise() const
 
 void GLWidget::initializeGL()
 {
-    GLfloat AmbijentalnoSvetlo[] = { 0.1f, 0.1f, 0.1f, 1.0f };
-    GLfloat DifuznoSvetlo[] =      { 1.0f, 1.0f, 1.0f, 1.0f };
+    GLfloat AmbijentalnoSvetlo[] = { ambient[0], ambient[1], ambient[2], 1.0f };
+    GLfloat DifuznoSvetlo[] =      { difuse[0], difuse[1], difuse[2], 1.0f };
     glClearColor (0.0, 0.0, 0.0, 0.0);
     glShadeModel (GL_SMOOTH);
 
@@ -200,7 +205,7 @@ void GLWidget::initializeGL()
 
 void GLWidget::paintGL()
 {
-    GLfloat PozicijaSvetla[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+    GLfloat PozicijaSvetla[] = {position[0], position[1], position[2], 1.0f };
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();

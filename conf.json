@@ -1,5 +1,10 @@
 {
     "background": "teksture/zvezde.bmp",
+    "lighting": {
+        "ambient": [0.1, 0.1, 0.1],
+        "difuse": [1.0, 1.0, 1.0],
+        "position": [0.0, 0.0, 0.0]
+    },
     "stars": [
         {
             "name": "sun",

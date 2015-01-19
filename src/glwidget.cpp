@@ -71,20 +71,20 @@ void GLWidget::loadConfiguration(QString filename)
     pozadina = make_unique<NebeskoTelo>("", UNIV_R, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
                                         make_unique<Tekstura>(confDir + background), true);
 
-    const QString STARS = "stars";
-    const QString PLANETS = "planets";
-    const QString NAME = "name";
-    const QString RADIUS = "radius";
-    const QString REVOLUTION_VELOCITY = "revolution_velocity";
-    const QString REVOLUTION_RADIUS = "revolution_radius";
-    const QString ROTATION_VELOCITY = "rotation_velocity";
-    const QString SLOPE = "slope";
-    const QString ROTATION_SLOPE = "rotation_slope";
-    const QString TEXTURE = "texture";
-    const QString RING = "ring";
-    const QString RING_INNER_RADIUS = "inner_radius";
-    const QString RING_OUTTER_RADIUS = "outter_radius";
-    const QString SATELLITES = "satellites";
+    static const QString STARS = "stars";
+    static const QString PLANETS = "planets";
+    static const QString NAME = "name";
+    static const QString RADIUS = "radius";
+    static const QString REVOLUTION_VELOCITY = "revolution_velocity";
+    static const QString REVOLUTION_RADIUS = "revolution_radius";
+    static const QString ROTATION_VELOCITY = "rotation_velocity";
+    static const QString SLOPE = "slope";
+    static const QString ROTATION_SLOPE = "rotation_slope";
+    static const QString TEXTURE = "texture";
+    static const QString RING = "ring";
+    static const QString RING_INNER_RADIUS = "inner_radius";
+    static const QString RING_OUTTER_RADIUS = "outter_radius";
+    static const QString SATELLITES = "satellites";
 
     QJsonArray starsArray = system[STARS].toArray();
     for(const QJsonValue &starValue: starsArray)

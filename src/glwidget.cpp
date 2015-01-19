@@ -68,7 +68,7 @@ void GLWidget::loadConfiguration(QString filename)
     QFileInfo confInfo(file);
     QString confDir = confInfo.absolutePath() + QDir::separator();
 
-    pozadina = make_unique<NebeskoTelo>("", UNIV_R, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
+    pozadina = make_unique<NebeskoTelo>("", 2*UNIV_R, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
                                         make_unique<Tekstura>(confDir + background), true);
 
     static const QString STARS = "stars";
@@ -245,7 +245,7 @@ void GLWidget::paintGL()
     int x_diff;
     int y_diff;
     int z_diff;
-    int r_diff;
+    int r, r2;
 
     switch (view_mode)
     {
@@ -255,12 +255,11 @@ void GLWidget::paintGL()
         break;
 
     case view_modes::SPHERE:
-        //TODO: need refining
-        pos_y = view_radius * UNIV_R;
-        y_diff = cos(RAD_PER_DEG*scale_y*360) * view_radius * UNIV_R;
-        r_diff = sin(RAD_PER_DEG*scale_y*360) * view_radius * UNIV_R;
-        x_diff = sin(RAD_PER_DEG*scale_x*360) * r_diff;
-        z_diff = cos(RAD_PER_DEG*scale_x*360) * r_diff;
+        r = view_radius * UNIV_R;
+        y_diff = sin(RAD_PER_DEG*scale_y*360) * r;
+        r2 = cos(RAD_PER_DEG*scale_y*360) * r;
+        x_diff = sin(RAD_PER_DEG*scale_x*360) * r2;
+        z_diff = cos(RAD_PER_DEG*scale_x*360) * r2;
         gluLookAt(pos_x + x_diff, y_diff, pos_z + z_diff, view_x, 0, view_z, 0, 1, 0);
         break;
 
@@ -306,7 +305,7 @@ void GLWidget::paintGL()
 
     glPushMatrix();
     glLoadIdentity();
-    gluPerspective(60, (GLfloat)win_width/(GLfloat)win_height, 1, 1200);
+    gluPerspective(60, (GLfloat)win_width/(GLfloat)win_height, 1, 2000);
     glDisable(GL_LIGHTING);
     glDisable(GL_DEPTH_TEST);
     qglColor(Qt::white);
@@ -345,7 +344,7 @@ void GLWidget::resizeGL(int width, int height)
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60, (GLfloat)width/(GLfloat)height, 1, 1200);
+    gluPerspective(60, (GLfloat)width/(GLfloat)height, 1, 2000);
 
     glMatrixMode(GL_MODELVIEW);
 

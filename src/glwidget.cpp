@@ -129,7 +129,7 @@ void GLWidget::loadConfiguration(QString filename)
     for(const QJsonValue &starValue: starsArray)
     {
         QJsonObject star = starValue.toObject();
-        stars.push_back(loadStelarBody(confDir, star, true, 50));
+        bodies.push_back(loadStelarBody(confDir, star, true, 50));
     }
 
     QJsonArray planetsArray = system[PLANETS].toArray();
@@ -160,7 +160,7 @@ void GLWidget::loadConfiguration(QString filename)
             }
         }
 
-        planets.push_back( std::move(new_planet) );
+        bodies.push_back( std::move(new_planet) );
     }
     initializeGL();
 }
@@ -177,7 +177,7 @@ std::string GLWidget::view_to_string(view_modes mode)
 
 bool GLWidget::isInitialise() const
 {
-    return (pozadina && !stars.empty() && !planets.empty());
+    return (pozadina && !bodies.empty());
 }
 
 void GLWidget::initializeGL()
@@ -217,14 +217,14 @@ void GLWidget::paintGL()
     double view_x;
     double view_z;
 
-    if(pogled == 0)
+    if(view_body == -1)
     {
         view_x = 0;
         view_z = 0;
     }
     else
     {
-        auto temp = planets.at(pogled - 1)->getPos();
+        auto temp = bodies.at(view_body)->getPos();
         view_x = get<0>(temp);
         view_z = get<1>(temp);
     }
@@ -233,16 +233,16 @@ void GLWidget::paintGL()
     double pos_x;
     double pos_z;
 
-    if(planeta != -1)
+    if(ref_body != -1)
     {
-        auto temp = planets.at(planeta)->getPos();
+        auto temp = bodies.at(ref_body)->getPos();
         pos_x = get<0>(temp);
         pos_z = get<1>(temp);
     }
     else
     {
-        pos_x = -70;
-        pos_z = 30;
+        pos_x = 0;
+        pos_z = 0;
     }
 
     // view modes
@@ -290,20 +290,14 @@ void GLWidget::paintGL()
 
     pozadina->crtaj(this);
 
-    for(const auto &star: stars)
+    for(unsigned i = 0; i < bodies.size(); i++)
     {
-        star->crtaj(this);
-        star->pomeri(proteklo.count());
-    }
-
-    for(unsigned i = 0; i < planets.size(); i++)
-    {
-        const auto &planet = planets[i];
-        if (view_mode != view_modes::CENTER || planeta != (int)i)
+        const auto &body = bodies[i];
+        if (view_mode != view_modes::CENTER || ref_body != (int)i)
         {
-            planet->crtaj(this);
+            body->crtaj(this);
         }
-        planet->pomeri(proteklo.count());
+        body->pomeri(proteklo.count());
     }
 
     prethodno_vreme += proteklo;
@@ -320,11 +314,11 @@ void GLWidget::paintGL()
                QFont("Arial", 12, QFont::Bold));
 
     renderText(-2.1, 0.55, 0.0,
-               QString::fromStdString("Referent body: " + (planeta==-1? "Nowhere": planets[planeta]->ime)),
+               QString::fromStdString("Referent body: " + (ref_body==-1? "Center": bodies[ref_body]->ime)),
                QFont("Arial", 12, QFont::Bold));
 
     renderText(-2.1, 0.50, 0.0,
-               QString::fromStdString("View body: " + planets[pogled]->ime),
+               QString::fromStdString("View body: " + (view_body==-1? "Center": bodies[view_body]->ime)),
                QFont("Arial", 12, QFont::Bold));
 
     if (view_mode == view_modes::SPHERE)
@@ -386,37 +380,33 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         break;
 
     case Qt::Key_Up:
-        if(planeta < (int)planets.size() - 1)
-            planeta++;
+        if (ref_body < (int)bodies.size()-1)
+            ref_body++;
         break;
 
     case Qt::Key_Down:
-        if(planeta >= 0)
-            planeta --;
+        if (ref_body >= 0)
+            ref_body --;
         break;
 
     case Qt::Key_Left:
-        if (pogled > 0)
-            pogled--;
+        if (view_body >= 0)
+            view_body--;
         break;
 
     case Qt::Key_Right:
-        if (pogled < (int)planets.size())
-            pogled++;
+        if (view_body < (int)bodies.size()-1)
+            view_body++;
         break;
 
     case Qt::Key_Z:
         if (view_radius >= 0.1)
-        {
             view_radius -= 0.05;
-        }
         break;
 
     case Qt::Key_X:
         if (view_radius <= 0.9)
-        {
             view_radius += 0.05;
-        }
         break;
 
     case Qt::Key_1:

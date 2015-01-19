@@ -46,8 +46,7 @@ private slots:
 
 private:
     std::unique_ptr<NebeskoTelo> pozadina;
-    std::vector<std::unique_ptr<NebeskoTelo>> stars;
-    std::vector<std::unique_ptr<NebeskoTelo>> planets;
+    std::vector<std::unique_ptr<NebeskoTelo>> bodies;
 
     std::chrono::system_clock::time_point prethodno_vreme;
 
@@ -59,8 +58,8 @@ private:
     int win_height = 0;
     const float UNIV_R = 500.0f;
 
-    int pogled = 0;
-    int planeta = -1;
+    int view_body = 0;
+    int ref_body = -1;
     float view_radius = 0.5;
     view_modes view_mode = view_modes::AXIS;
 

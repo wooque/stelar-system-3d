@@ -15,6 +15,7 @@
 #include <QFileInfo>
 #include <QDir>
 #include <QString>
+#include <QFont>
 
 #include <string>
 
@@ -66,11 +67,12 @@ void GLWidget::loadConfiguration(QString filename)
     QFileInfo confInfo(file);
     QString confDir = confInfo.absolutePath() + QDir::separator();
 
-    pozadina = make_unique<NebeskoTelo>(UNIV_R, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
+    pozadina = make_unique<NebeskoTelo>("", UNIV_R, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
                                         make_unique<Tekstura>(confDir + background), true);
 
     const QString STARS = "stars";
     const QString PLANETS = "planets";
+    const QString NAME = "name";
     const QString RADIUS = "radius";
     const QString REVOLUTION_VELOCITY = "revolution_velocity";
     const QString REVOLUTION_RADIUS = "revolution_radius";
@@ -88,6 +90,7 @@ void GLWidget::loadConfiguration(QString filename)
     {
         QJsonObject star = starValue.toObject();
         stars.push_back(make_unique<NebeskoTelo>(
+                            star[NAME].toString().toStdString(),
                             star[RADIUS].toDouble(),
                             star[REVOLUTION_VELOCITY].toDouble(),
                             star[REVOLUTION_RADIUS].toDouble(),
@@ -106,6 +109,7 @@ void GLWidget::loadConfiguration(QString filename)
     {
         QJsonObject planet = planetValue.toObject();
         auto new_planet = make_unique<NebeskoTelo>(
+                            planet[NAME].toString().toStdString(),
                             planet[RADIUS].toDouble(),
                             planet[REVOLUTION_VELOCITY].toDouble(),
                             planet[REVOLUTION_RADIUS].toDouble(),
@@ -135,6 +139,7 @@ void GLWidget::loadConfiguration(QString filename)
             {
                 QJsonObject satellite = satelliteValue.toObject();
                 new_planet->dodajSatelit(make_unique<NebeskoTelo>(
+                                             satellite[NAME].toString().toStdString(),
                                              satellite[RADIUS].toDouble(),
                                              satellite[REVOLUTION_VELOCITY].toDouble(),
                                              satellite[REVOLUTION_RADIUS].toDouble(),
@@ -278,11 +283,11 @@ void GLWidget::paintGL()
     else
         prethodno_vreme = system_clock::now();
 
-    pozadina->crtaj();
+    pozadina->crtaj(this);
 
     for(const auto &star: stars)
     {
-        star->crtaj();
+        star->crtaj(this);
         star->pomeri(proteklo.count());
     }
 
@@ -291,7 +296,7 @@ void GLWidget::paintGL()
         const auto &planet = planets[i];
         if (view_mode != view_modes::CENTER || planeta != (int)i)
         {
-            planet->crtaj();
+            planet->crtaj(this);
         }
         planet->pomeri(proteklo.count());
     }
@@ -304,8 +309,9 @@ void GLWidget::paintGL()
     glDisable(GL_LIGHTING);
     glDisable(GL_DEPTH_TEST);
     qglColor(Qt::white);
-    renderText(-2.1, 0.60, 0.0, QString::fromStdString("View body: " + to_string(pogled)), QFont("Arial", 12));
-    renderText(-2.1, 0.55, 0.0, QString::fromStdString("Referent body: " + to_string(planeta)), QFont("Arial", 12));
+    renderText(-2.1, 0.60, 0.0, QString::fromStdString("View body: " + planets[pogled]->ime), QFont("Arial", 12));
+    renderText(-2.1, 0.55, 0.0, QString::fromStdString("Referent body: " +
+                                                       (planeta==-1? "Nowhere": planets[planeta]->ime)), QFont("Arial", 12));
     renderText(-2.1, 0.50, 0.0, QString::fromStdString("View mode: " + view_to_string(view_mode)), QFont("Arial", 12));
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);

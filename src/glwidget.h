@@ -7,7 +7,7 @@
 #include <memory>
 #include <chrono>
 
-#include "NebeskoTelo.h"
+class NebeskoTelo;
 
 enum class view_modes {AXIS, SPHERE, CENTER};
 

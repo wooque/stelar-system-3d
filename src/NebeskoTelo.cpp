@@ -1,6 +1,7 @@
 #include "NebeskoTelo.h"
 
 #include <cmath>
+#include <QFont>
 
 using std::unique_ptr;
 using std::move;
@@ -96,7 +97,7 @@ void NebeskoTelo::crtajSferu(float radius, int br_segmenata)
     }
 }
 
-void NebeskoTelo::crtaj() const
+void NebeskoTelo::crtaj(GLWidget *glw) const
 {
     glPushMatrix();
     glRotated( nagib_ravni, 1, 0, 0 );
@@ -128,7 +129,12 @@ void NebeskoTelo::crtaj() const
         tekstura->ponistiTeksturu();
 
     for(const auto &satelit: sateliti)
-        satelit->crtaj();
+        satelit->crtaj(glw);
+
+    glPushMatrix();
+    glColor3f(1, 1, 1);
+    glw->renderText(0.0, poluprecnik, 0.0, QString::fromStdString(ime), QFont());
+    glPopMatrix();
 
     glPopMatrix();
 }

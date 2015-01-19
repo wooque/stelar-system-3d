@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Tekstura.h"
+#include "glwidget.h"
 #include <deque>
 #include <memory>
 #include <vector>
@@ -54,6 +55,8 @@ public:
 
 class NebeskoTelo
 {
+public:
+    std::string                                 ime;
 private:
     std::unique_ptr<Tekstura>                   tekstura;
     float                                       poluprecnik;
@@ -72,7 +75,8 @@ private:
     std::unique_ptr<Svetlo>                     svetlo;
 
 public:
-    NebeskoTelo( float arg_poluprecnik,
+    NebeskoTelo( std::string arg_ime,
+                 float arg_poluprecnik,
                  float arg_brzina_revolucije,
                  float arg_poluprecnik_revolucije,
                  float arg_brzina_rotacije,
@@ -83,7 +87,8 @@ public:
                  bool arg_is_star = false,
                  std::unique_ptr<Prsten> p = nullptr,
                  std::unique_ptr<Svetlo> s = nullptr)
-        : tekstura(std::move(t)),
+        : ime(arg_ime),
+          tekstura(std::move(t)),
           poluprecnik(arg_poluprecnik),
           ugao_revolucije(0),
           brzina_revolucije(arg_brzina_revolucije),
@@ -102,7 +107,7 @@ public:
     ~NebeskoTelo() {}
 
     static void crtajSferu(float radius, int br_segmenata);
-    void crtaj() const;
+    void crtaj(GLWidget *glw) const;
     void crtajTelo() const;
 
     void pomeri(int proteklo_vreme);

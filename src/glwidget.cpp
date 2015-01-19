@@ -1,7 +1,9 @@
 #include "glwidget.h"
-
 #include "Tekstura.h"
 #include "NebeskoTelo.h"
+
+#include <string>
+#include <cstdio>
 
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -17,8 +19,6 @@
 #include <QString>
 #include <QFont>
 
-#include <string>
-
 // test
 #include <iostream>
 using std::cout;
@@ -32,6 +32,7 @@ using std::unique_ptr;
 using std::get;
 using std::make_unique;
 using std::to_string;
+using std::string;
 
 GLWidget::GLWidget(QWidget *parent)
     : QGLWidget(parent)
@@ -255,9 +256,9 @@ void GLWidget::paintGL()
 
     case view_modes::SPHERE:
         //TODO: need refining
-        pos_y = 0.25 * UNIV_R;
-        y_diff = cos(RAD_PER_DEG*scale_y*360) * 0.25 * UNIV_R;
-        r_diff = sin(RAD_PER_DEG*scale_y*360) * 0.25 * UNIV_R;
+        pos_y = view_radius * UNIV_R;
+        y_diff = cos(RAD_PER_DEG*scale_y*360) * view_radius * UNIV_R;
+        r_diff = sin(RAD_PER_DEG*scale_y*360) * view_radius * UNIV_R;
         x_diff = sin(RAD_PER_DEG*scale_x*360) * r_diff;
         z_diff = cos(RAD_PER_DEG*scale_x*360) * r_diff;
         gluLookAt(pos_x + x_diff, y_diff, pos_z + z_diff, view_x, 0, view_z, 0, 1, 0);
@@ -309,10 +310,28 @@ void GLWidget::paintGL()
     glDisable(GL_LIGHTING);
     glDisable(GL_DEPTH_TEST);
     qglColor(Qt::white);
-    renderText(-2.1, 0.60, 0.0, QString::fromStdString("View body: " + planets[pogled]->ime), QFont("Arial", 12));
-    renderText(-2.1, 0.55, 0.0, QString::fromStdString("Referent body: " +
-                                                       (planeta==-1? "Nowhere": planets[planeta]->ime)), QFont("Arial", 12));
-    renderText(-2.1, 0.50, 0.0, QString::fromStdString("View mode: " + view_to_string(view_mode)), QFont("Arial", 12));
+
+    renderText(-2.1, 0.60, 0.0,
+               QString::fromStdString("View mode: " + view_to_string(view_mode)),
+               QFont("Arial", 12, QFont::Bold));
+
+    renderText(-2.1, 0.55, 0.0,
+               QString::fromStdString("Referent body: " + (planeta==-1? "Nowhere": planets[planeta]->ime)),
+               QFont("Arial", 12, QFont::Bold));
+
+    renderText(-2.1, 0.50, 0.0,
+               QString::fromStdString("View body: " + planets[pogled]->ime),
+               QFont("Arial", 12, QFont::Bold));
+
+    if (view_mode == view_modes::SPHERE)
+    {
+        char rad_str[5];
+        snprintf(rad_str, 5, "%.2f", view_radius);
+        renderText(-2.1, 0.45, 0.0,
+                   QString::fromStdString("View radius: " + string(rad_str)),
+                   QFont("Arial", 12, QFont::Bold));
+    }
+
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
     glPopMatrix();
@@ -380,6 +399,20 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
     case Qt::Key_Right:
         if (pogled < (int)planets.size())
             pogled++;
+        break;
+
+    case Qt::Key_Z:
+        if (view_radius >= 0.1)
+        {
+            view_radius -= 0.05;
+        }
+        break;
+
+    case Qt::Key_X:
+        if (view_radius <= 0.9)
+        {
+            view_radius += 0.05;
+        }
         break;
 
     case Qt::Key_1:

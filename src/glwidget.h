@@ -47,6 +47,7 @@ private:
 
     int pogled = 0;
     int planeta = -1;
+    float view_radius = 0.5;
     view_modes view_mode = view_modes::AXIS;
 
     float scale_x = 0.0f;

@@ -6,9 +6,8 @@
 #include <memory>
 #include <vector>
 #include <utility>
-#include <cmath>
 
-const float RAD_PER_DEG = M_PI/180;
+const float RAD_PER_DEG = 3.14159265358979323846/180;
 
 class Prsten
 {

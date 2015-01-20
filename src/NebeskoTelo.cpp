@@ -117,23 +117,19 @@ void NebeskoTelo::crtaj(GLWidget *glw) const
     glPopMatrix();
     glEnable(GL_LIGHTING);
 
-    if( tekstura )
-        tekstura->primeniTeksturu();
+
     glRotated( ugao_revolucije, 0, 1, 0 );
     glTranslated( poluprecnik_revolucije, 0, 0 );
     glRotated( -ugao_revolucije, 0, 1, 0 );
 
     crtajTelo();
 
-    if( tekstura )
-        tekstura->ponistiTeksturu();
-
     for(const auto &satelit: sateliti)
         satelit->crtaj(glw);
 
     glPushMatrix();
     glColor3f(1, 1, 1);
-    glw->renderText(0.0, poluprecnik, 0.0, QString::fromStdString(ime), QFont());
+    glw->renderText(0, 1.1*poluprecnik, 0, QString::fromStdString(ime), QFont());
     glPopMatrix();
 
     glPopMatrix();
@@ -162,15 +158,13 @@ std::pair<float, float> NebeskoTelo::getPos() const
 
 void NebeskoTelo::crtajTelo() const
 {
-    if( !is_star )
-        glEnable(GL_LIGHTING);
-    else
+    glPushMatrix();
+
+    if( is_star )
     {
         glDisable(GL_LIGHTING);
         glDisable(GL_BLEND);
     }
-
-    glPushMatrix();
 
     if( nagib > 0 )
         glRotated( nagib, 0, 0, -1 );
@@ -180,20 +174,29 @@ void NebeskoTelo::crtajTelo() const
     if( ugao_rotacije > 0)
         glRotated(ugao_rotacije, 0, 1, 0);
 
+    if( tekstura )
+        tekstura->primeniTeksturu();
+
     crtajSferu( 1, 9 );
 
-    if (prsten)
+    if( tekstura )
+        tekstura->ponistiTeksturu();
+
+    if( prsten )
         prsten->crtajPrsten();
 
-    if (is_star)
+    if( is_star )
+    {
         glEnable(GL_BLEND);
+        glEnable(GL_LIGHTING);
+    }
 
     glPopMatrix();
 }
 
 void NebeskoTelo::crtajSvetlo() const
 {
-    if(!svetlo)
+    if( !svetlo )
         return;
 
     svetlo->crtajSvetlo(0.0f, 0.0f, 0.0f);
@@ -201,11 +204,12 @@ void NebeskoTelo::crtajSvetlo() const
 
 void Prsten::crtajPrsten() const
 {
+    glPushMatrix();
     glDisable(GL_LIGHTING);
 //    glDisable(GL_DEPTH);
-    glBegin(GL_QUAD_STRIP);
     if( tex_prsten )
         tex_prsten->primeniTeksturu();
+    glBegin(GL_QUAD_STRIP);
     int seg = 90.0 / prsten_n;
     for ( unsigned i = 0; i <= 360; i+=seg )
     {
@@ -217,7 +221,11 @@ void Prsten::crtajPrsten() const
         glVertex3d(cos_t * spolj_r, 0, -sin_t * spolj_r);
     }
     glEnd();
+    if( tex_prsten )
+        tex_prsten->ponistiTeksturu();
 //    glEnable(GL_DEPTH);
+    glEnable(GL_LIGHTING);
+    glPopMatrix();
 }
 
 void Svetlo::crtajSvetlo(float x, float y, float z) const

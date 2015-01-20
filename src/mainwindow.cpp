@@ -5,20 +5,6 @@
 
 MainWindow::MainWindow()
 {
-    centralWidget = new QWidget;
-    setCentralWidget(centralWidget);
-
-    glWidget = new GLWidget;
-
-    glWidgetArea = new QScrollArea;
-    glWidgetArea->setFocusPolicy(Qt::NoFocus);
-    glWidgetArea->setWidget(glWidget);
-    glWidgetArea->setWidgetResizable(true);
-    glWidgetArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    glWidgetArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    glWidgetArea->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-    glWidgetArea->setMinimumSize(50, 50);
-
     openSystem = new QAction(tr("&Open system"), this);
     openSystem->setShortcut(QKeySequence::Open);
     connect(openSystem, SIGNAL(triggered()), this, SLOT(openConfiguration()));
@@ -28,6 +14,7 @@ MainWindow::MainWindow()
     connect(exitAct, SIGNAL(triggered()), this, SLOT(close()));
 
     aboutAct = new QAction(tr("&About"), this);
+    aboutAct->setShortcuts(QKeySequence::HelpContents);
     connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
 
     fileMenu = menuBar()->addMenu(tr("&File"));
@@ -38,9 +25,16 @@ MainWindow::MainWindow()
     helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(aboutAct);
 
-    QGridLayout *centralLayout = new QGridLayout;
-    centralLayout->addWidget(glWidgetArea, 0, 0);
-    centralWidget->setLayout(centralLayout);
+    glWidget = new GLWidget;
+    glWidgetArea = new QScrollArea;
+    glWidgetArea->setFocusPolicy(Qt::NoFocus);
+    glWidgetArea->setWidget(glWidget);
+    glWidgetArea->setWidgetResizable(true);
+    glWidgetArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    glWidgetArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    glWidgetArea->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    glWidgetArea->setMinimumSize(50, 50);
+    setCentralWidget(glWidgetArea);
 
     setWindowTitle(tr("Planetarium"));
     resize(1024, 600);
@@ -59,7 +53,5 @@ void MainWindow::openConfiguration()
 
 void MainWindow::about()
 {
-    QMessageBox::about(this, tr("About Planetarium"),
-            tr("<b>Planetarium</b> visualises star systems"));
+    QMessageBox::about(this, tr("About Planetarium"), tr("Visualises star systems"));
 }
-

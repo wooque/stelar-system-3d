@@ -29,7 +29,6 @@ using std::chrono::duration_cast;
 using std::chrono::milliseconds;
 using std::unique_ptr;
 using std::get;
-using std::make_unique;
 using std::to_string;
 using std::string;
 
@@ -87,18 +86,18 @@ unique_ptr<NebeskoTelo> GLWidget::loadStelarBody(const QString &conf_dir,
                                                  bool is_star,
                                                  int trail_length)
 {
-    return make_unique<NebeskoTelo>(
-                data[NAME].toString().toStdString(),
-                data[RADIUS].toDouble(),
-                data[REVOLUTION_VELOCITY].toDouble(),
-                data[REVOLUTION_RADIUS].toDouble(),
-                data[ROTATION_VELOCITY].toDouble(),
-                data[SLOPE].toDouble(),
-                data[ROTATION_SLOPE].toDouble(),
-                trail_length,
-                make_unique<Tekstura>(conf_dir + data[TEXTURE].toString()),
-                is_star
-                );
+    return unique_ptr<NebeskoTelo>(
+                new NebeskoTelo(
+                    data[NAME].toString().toStdString(),
+                    data[RADIUS].toDouble(),
+                    data[REVOLUTION_VELOCITY].toDouble(),
+                    data[REVOLUTION_RADIUS].toDouble(),
+                    data[ROTATION_VELOCITY].toDouble(),
+                    data[SLOPE].toDouble(),
+                    data[ROTATION_SLOPE].toDouble(),
+                    trail_length,
+                    unique_ptr<Tekstura>(new Tekstura(conf_dir + data[TEXTURE].toString())),
+                    is_star));
 }
 
 void GLWidget::loadConfiguration(QString filename)
@@ -122,8 +121,10 @@ void GLWidget::loadConfiguration(QString filename)
     loadLightingData(position, lightingData, POSITION);
 
     QString background = system[BACKGROUND].toString();
-    pozadina = make_unique<NebeskoTelo>("", 2*UNIV_R, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
-                                        make_unique<Tekstura>(confDir + background), true);
+    pozadina = unique_ptr<NebeskoTelo>(
+                new NebeskoTelo("", 2*UNIV_R, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0,
+                                unique_ptr<Tekstura>(new Tekstura(confDir + background)),
+                                true));
 
     QJsonArray starsArray = system[STARS].toArray();
     for(const QJsonValue &starValue: starsArray)
@@ -141,13 +142,13 @@ void GLWidget::loadConfiguration(QString filename)
         if(!planet[RING].isNull())
         {
             QJsonObject ring = planet[RING].toObject();
-            new_planet->dodajPrsten(make_unique<Prsten>(
-                                        ring[RING_INNER_RADIUS].toDouble(),
-                                        ring[RING_OUTTER_RADIUS].toDouble(),
-                                        make_unique<Tekstura>(confDir + ring[TEXTURE].toString()),
-                                        10
-                                        )
-                                    );
+            new_planet->dodajPrsten(unique_ptr<Prsten>(
+                                        new Prsten(
+                                            ring[RING_INNER_RADIUS].toDouble(),
+                                            ring[RING_OUTTER_RADIUS].toDouble(),
+                                            unique_ptr<Tekstura>(
+                                                new Tekstura(confDir + ring[TEXTURE].toString())),
+                                            10)));
         }
 
         if(!planet[SATELLITES].isNull())
@@ -309,7 +310,7 @@ void GLWidget::paintGL()
     glDisable(GL_DEPTH_TEST);
     qglColor(Qt::white);
 
-    renderText(-2.1, 0.60, 0.0,
+    renderText(-2.2, 0.6, 0.0,
                QString::fromStdString("View mode: " + view_to_string(view_mode)),
                QFont("Arial", 12, QFont::Bold));
 

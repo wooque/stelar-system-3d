@@ -81,7 +81,7 @@
         {
             "name": "jupiter",
             "radius": 6.5,
-            "revolution_velocity": 0.002,
+            "revolution_velocity": 0.02,
             "revolution_radius": 60,
             "rotation_velocity": 0.06,
             "slope": 60,
@@ -91,7 +91,7 @@
         {
             "name": "saturn",
             "radius": 4.7,
-            "revolution_velocity": 0.0009,
+            "revolution_velocity": 0.009,
             "revolution_radius": 100,
             "rotation_velocity": 0.07,
             "slope": 0,
@@ -106,7 +106,7 @@
         {
             "name": "uranus",
             "radius": 3.3,
-            "revolution_velocity": 0.0005,
+            "revolution_velocity": 0.005,
             "revolution_radius": 150,
             "rotation_velocity": 0.08,
             "slope": 98,
@@ -116,7 +116,7 @@
         {
             "name": "neptune",
             "radius": 2.7,
-            "revolution_velocity": 0.0003,
+            "revolution_velocity": 0.003,
             "revolution_radius": 190,
             "rotation_velocity": 0.09,
             "slope": 0,

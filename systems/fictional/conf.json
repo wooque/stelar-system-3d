@@ -1,0 +1,117 @@
+{
+    "background": "teksture/background.jpg",
+    "ambient-lighting": [0.1, 0.1, 0.1],
+    "stars": [
+        {
+            "name": "Analog",
+            "radius": 3,
+            "revolution_velocity": 0.03,
+            "revolution_radius": 2,
+            "rotation_velocity": 0.05,
+            "slope": 0,
+            "rotation_slope": 0,
+            "texture": "teksture/Analog.jpg",
+            "lighting": [1.0, 1.0, 1.0]
+        },
+        {
+            "name": "Aquatis",
+            "radius": 5,
+            "revolution_velocity": 0.1,
+            "revolution_radius": 10,
+            "rotation_velocity": 0.1,
+            "slope": 0,
+            "rotation_slope": 0,
+            "texture": "teksture/aquatis.png",
+            "lighting": [1.0, 1.0, 1.0]
+        }
+     ],
+    "planets": [
+        {
+            "name": "Europa",
+            "radius": 0.93,
+            "revolution_velocity": 0.03,
+            "revolution_radius": 24,
+            "rotation_velocity": 0.02,
+            "slope": 0,
+            "rotation_slope": 30,
+            "texture": "teksture/Europa.jpg"
+        },
+        {
+            "name": "Iceandcraters",
+            "radius": 1,
+            "revolution_velocity": 0.01,
+            "revolution_radius": 35,
+            "rotation_velocity": 0.03,
+            "slope": 23.5,
+            "rotation_slope": 0,
+            "texture": "teksture/Iceandcraters.jpg",
+            "satellites": [
+                {
+                    "name": "Frozen",
+                    "radius": 0.2,
+                    "revolution_velocity": 0.1,
+                    "revolution_radius": 5.0,
+                    "rotation_velocity": 0.04,
+                    "slope": 0,
+                    "rotation_slope": 0,
+                    "texture": "teksture/Frozen.jpg"
+                 }
+             ]
+        },
+        {
+            "name": "Icy",
+            "radius": 0.88,
+            "revolution_velocity": 0.007,
+            "revolution_radius": 43,
+            "rotation_velocity": 0.05,
+            "slope": 0,
+            "rotation_slope": 0,
+            "texture": "teksture/Icy.jpg"
+        },
+        {
+            "name": "Io",
+            "radius": 6.5,
+            "revolution_velocity": 0.02,
+            "revolution_radius": 60,
+            "rotation_velocity": 0.06,
+            "slope": 60,
+            "rotation_slope": 0,
+            "texture": "teksture/Io.jpg"
+        },
+        {
+            "name": "Janus",
+            "radius": 4.7,
+            "revolution_velocity": 0.009,
+            "revolution_radius": 100,
+            "rotation_velocity": 0.07,
+            "slope": 0,
+            "rotation_slope": 0,
+            "texture": "teksture/Janus.jpg",
+            "ring": {
+                "inner_radius": 1.5,
+                "outter_radius": 2.5,
+                "texture": "teksture/Ring2.png"
+             }
+        },
+        {
+            "name": "Phoebe",
+            "radius": 3.3,
+            "revolution_velocity": 0.005,
+            "revolution_radius": 150,
+            "rotation_velocity": 0.08,
+            "slope": 98,
+            "rotation_slope": 0,
+            "texture": "teksture/Phoebe.jpg"
+        },
+        {
+            "name": "tetys",
+            "radius": 2.7,
+            "revolution_velocity": 0.003,
+            "revolution_radius": 190,
+            "rotation_velocity": 0.09,
+            "slope": 0,
+            "rotation_slope": 10,
+            "texture": "teksture/Tethys.jpg"
+        }
+    ]
+}

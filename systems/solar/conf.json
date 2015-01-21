@@ -12,17 +12,6 @@
             "rotation_slope": 0,
             "texture": "teksture/gzvezda.bmp",
             "lighting": [1.0, 1.0, 1.0]
-        },
-        {
-            "name": "other sun",
-            "radius": 5,
-            "revolution_velocity": 0.1,
-            "revolution_radius": 10,
-            "rotation_velocity": 0.1,
-            "slope": 0,
-            "rotation_slope": 0,
-            "texture": "teksture/mesec.bmp",
-            "lighting": [1.0, 1.0, 1.0]
         }
      ],
     "planets": [

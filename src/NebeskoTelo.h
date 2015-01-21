@@ -5,6 +5,7 @@
 #include <deque>
 #include <memory>
 #include <vector>
+#include <tuple>
 #include <utility>
 
 const float RAD_PER_DEG = 3.14159265358979323846/180;
@@ -137,5 +138,5 @@ public:
         svetlo = std::move(arg_svetlo);
     }
 
-    std::pair<float, float> getPos() const;
+    std::tuple<float, float, float> getPos() const;
 };

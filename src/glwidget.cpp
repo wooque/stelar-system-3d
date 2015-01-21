@@ -216,38 +216,43 @@ void GLWidget::paintGL()
 
     // looking-at body
     double view_x;
+    double view_y;
     double view_z;
 
     if(view_body == -1)
     {
         view_x = 0;
+        view_y = 0;
         view_z = 0;
     }
     else
     {
         auto temp = bodies.at(view_body)->getPos();
         view_x = get<0>(temp);
-        view_z = get<1>(temp);
+        view_y = get<1>(temp);
+        view_z = get<2>(temp);
     }
 
     // referent body
     double pos_x;
+    double pos_y;
     double pos_z;
 
     if(ref_body != -1)
     {
         auto temp = bodies.at(ref_body)->getPos();
         pos_x = get<0>(temp);
-        pos_z = get<1>(temp);
+        pos_y = get<1>(temp);
+        pos_z = get<2>(temp);
     }
     else
     {
         pos_x = 0;
+        pos_y = 0;
         pos_z = 0;
     }
 
     // view modes
-    double pos_y;
     int x_diff;
     int y_diff;
     int z_diff;
@@ -256,8 +261,8 @@ void GLWidget::paintGL()
     switch (view_mode)
     {
     case view_modes::AXIS:
-        pos_y = scale_y * 0.98 * UNIV_R;
-        gluLookAt(pos_x, pos_y, pos_z, view_x, 0, view_z, 0, 1, 0);
+        y_diff = scale_y * 0.98 * UNIV_R;
+        gluLookAt(pos_x, pos_y + y_diff, pos_z, view_x, view_y, view_z, 0, 1, 0);
         break;
 
     case view_modes::SPHERE:
@@ -266,17 +271,14 @@ void GLWidget::paintGL()
         r2 = cos(RAD_PER_DEG*scale_y*360) * r;
         x_diff = sin(RAD_PER_DEG*scale_x*360) * r2;
         z_diff = cos(RAD_PER_DEG*scale_x*360) * r2;
-        gluLookAt(pos_x + x_diff, y_diff, pos_z + z_diff, view_x, 0, view_z, 0, 1, 0);
+        gluLookAt(pos_x + x_diff, pos_y + y_diff, pos_z + z_diff, view_x, view_y, view_z, 0, 1, 0);
         break;
 
     case view_modes::CENTER:
-        gluLookAt(pos_x, 0.0, pos_z, view_x, 0, view_z, 0, 1, 0);
+        gluLookAt(pos_x, pos_y, pos_z, view_x, view_y, view_z, 0, 1, 0);
         break;
 
     default:
-        // default to AXIS
-        pos_y = scale_y * 0.98 * UNIV_R;
-        gluLookAt(pos_x, pos_y, pos_z, view_x, 0, view_z, 0, 1, 0);
         break;
     }
 

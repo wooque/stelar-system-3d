@@ -5,8 +5,8 @@
 
 using std::unique_ptr;
 using std::move;
-using std::pair;
-using std::make_pair;
+using std::tuple;
+using std::make_tuple;
 using std::get;
 
 void NebeskoTelo::crtajSferu(float radius, int br_segmenata)
@@ -120,7 +120,6 @@ void NebeskoTelo::crtaj(GLWidget *glw) const
     glPopMatrix();
     glEnable(GL_LIGHTING);
 
-
     glRotated( ugao_revolucije, 0, 1, 0 );
     glTranslated( poluprecnik_revolucije, 0, 0 );
     glRotated( -ugao_revolucije, 0, 1, 0 );
@@ -129,11 +128,6 @@ void NebeskoTelo::crtaj(GLWidget *glw) const
 
     for(const auto &satelit: sateliti)
         satelit->crtaj(glw);
-
-    glPushMatrix();
-    glColor3f(1, 1, 1);
-    glw->renderText(0, 1.1*poluprecnik, 0, QString::fromStdString(ime), QFont());
-    glPopMatrix();
 
     glPopMatrix();
 }
@@ -152,11 +146,13 @@ void NebeskoTelo::pomeri(int proteklo_vreme)
 
 }
 
-pair<float, float> NebeskoTelo::getPos() const
+tuple<float, float, float> NebeskoTelo::getPos() const
 {
-    return make_pair<float, float>(
+    double new_r = -sin(ugao_revolucije * RAD_PER_DEG) * poluprecnik_revolucije;
+    return make_tuple<float, float, float>(
                 cos(ugao_revolucije * RAD_PER_DEG) * poluprecnik_revolucije,
-                -sin(ugao_revolucije * RAD_PER_DEG) * poluprecnik_revolucije);
+                new_r * sin(nagib*RAD_PER_DEG),
+                new_r * cos(nagib*RAD_PER_DEG));
 }
 
 void NebeskoTelo::crtajTelo() const
@@ -206,7 +202,7 @@ void NebeskoTelo::crtajSvetlo() const
         return;
 
     auto pos = getPos();
-    svetlo->crtajSvetlo(get<0>(pos), 0.0, get<1>(pos));
+    svetlo->crtajSvetlo(get<0>(pos), get<1>(pos), get<2>(pos));
 }
 
 void Prsten::crtajPrsten() const

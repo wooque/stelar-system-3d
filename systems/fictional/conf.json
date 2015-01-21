@@ -1,28 +1,28 @@
 {
     "background": "teksture/background.jpg",
-    "ambient-lighting": [0.1, 0.1, 0.1],
+    "ambient-lighting": [0.1, 0.1, 0.9],
     "stars": [
         {
             "name": "Analog",
             "radius": 3,
             "revolution_velocity": 0.03,
-            "revolution_radius": 2,
+            "revolution_radius": 5,
             "rotation_velocity": 0.05,
             "slope": 0,
             "rotation_slope": 0,
             "texture": "teksture/Analog.jpg",
-            "lighting": [1.0, 1.0, 1.0]
+            "lighting": [0.1, 1.0,  0.1]
         },
         {
             "name": "Aquatis",
-            "radius": 5,
+            "radius": 2,
             "revolution_velocity": 0.1,
-            "revolution_radius": 10,
+            "revolution_radius": 31,
             "rotation_velocity": 0.1,
             "slope": 0,
             "rotation_slope": 0,
             "texture": "teksture/aquatis.png",
-            "lighting": [1.0, 1.0, 1.0]
+            "lighting": [1.0, 0.1, 0.1]
         }
      ],
     "planets": [

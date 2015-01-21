@@ -197,9 +197,6 @@ void NebeskoTelo::crtajTelo() const
         glEnable(GL_LIGHTING);
     }
 
-    if (svetlo)
-        crtajSvetlo();
-
     glPopMatrix();
 }
 

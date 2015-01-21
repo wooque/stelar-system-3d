@@ -52,6 +52,7 @@ private:
     std::chrono::system_clock::time_point prethodno_vreme;
 
     float ambient[3] = {0.1, 0.1, 0.1};
+    int star_num = 0;
 
     int win_width = 0;
     int win_height = 0;

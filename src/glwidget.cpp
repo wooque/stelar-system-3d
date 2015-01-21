@@ -106,6 +106,7 @@ void GLWidget::loadConfiguration(QString filename)
     ref_body = -1;
     view_radius = 0.5;
     view_mode = view_modes::AXIS;
+    star_num = 0;
 
     QString settings;
     QFile file;
@@ -129,7 +130,7 @@ void GLWidget::loadConfiguration(QString filename)
                                 true));
 
     QJsonArray starsArray = system[STARS].toArray();
-    int i = 1;
+    int i = 0;
     for(const QJsonValue &starValue: starsArray)
     {
         QJsonObject star = starValue.toObject();
@@ -144,6 +145,7 @@ void GLWidget::loadConfiguration(QString filename)
         }
         bodies.push_back(std::move(new_star));
     }
+    star_num = i;
 
     QJsonArray planetsArray = system[PLANETS].toArray();
     for(const QJsonValue &planetValue: planetsArray)
@@ -203,9 +205,13 @@ void GLWidget::initializeGL()
     glEnable(GL_NORMALIZE);
 
     GLfloat AmbijentalnoSvetlo[] = { ambient[0], ambient[1], ambient[2], 1.0f };
-    glLightfv(GL_LIGHT1, GL_AMBIENT, AmbijentalnoSvetlo);
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, AmbijentalnoSvetlo);
-    glEnable(GL_LIGHT1);
+
+    for(int i = 0; i < star_num; i++)
+    {
+        glLightfv(Svetlo::LIGHTS[i], GL_AMBIENT, AmbijentalnoSvetlo);
+        glEnable(Svetlo::LIGHTS[i]);
+    }
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -295,6 +301,11 @@ void GLWidget::paintGL()
         proteklo = duration_cast<milliseconds>(system_clock::now() - prethodno_vreme);
     else
         prethodno_vreme = system_clock::now();
+
+    for (const auto &star: bodies)
+    {
+        star->crtajSvetlo();
+    }
 
     pozadina->crtaj(this);
 

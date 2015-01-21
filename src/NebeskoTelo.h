@@ -75,8 +75,8 @@ private:
     std::deque<float>                           segmenti;
     unsigned                                    kapacitet;
     std::vector<std::unique_ptr<NebeskoTelo>>   sateliti;
-    bool                                        is_star;
     std::unique_ptr<Prsten>                     prsten;
+    bool                                        is_star;
     std::unique_ptr<Svetlo>                     svetlo;
 
 public:
@@ -104,8 +104,8 @@ public:
           nagib_ravni(arg_nagib_ravni),
           segmenti(),
           kapacitet(broj_segmenata),
-          is_star(arg_is_star),
           prsten(std::move(p)),
+          is_star(arg_is_star),
           svetlo(std::move(s))
     {}
 

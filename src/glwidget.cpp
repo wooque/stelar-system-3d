@@ -302,21 +302,17 @@ void GLWidget::paintGL()
     prethodno_vreme += proteklo;
 
     glPushMatrix();
-    glLoadIdentity();
-    gluPerspective(60, (GLfloat)win_width/(GLfloat)win_height, 1, 2000);
-    //glDisable(GL_LIGHTING);
-    //glDisable(GL_DEPTH_TEST);
     qglColor(Qt::white);
 
-    renderText(-2.1, 0.60, 0.0,
+    renderText(10, 20,
                QString::fromStdString("View mode: " + view_to_string(view_mode)),
                QFont("Arial", 12, QFont::Bold));
 
-    renderText(-2.1, 0.55, 0.0,
+    renderText(10, 40,
                QString::fromStdString("Referent body: " + (ref_body==-1? "Center": bodies[ref_body]->ime)),
                QFont("Arial", 12, QFont::Bold));
 
-    renderText(-2.1, 0.50, 0.0,
+    renderText(10, 60,
                QString::fromStdString("View body: " + (view_body==-1? "Center": bodies[view_body]->ime)),
                QFont("Arial", 12, QFont::Bold));
 
@@ -324,13 +320,11 @@ void GLWidget::paintGL()
     {
         char rad_str[5];
         snprintf(rad_str, 5, "%.2f", view_radius);
-        renderText(-2.1, 0.45, 0.0,
+        renderText(10, 80,
                    QString::fromStdString("View radius: " + string(rad_str)),
                    QFont("Arial", 12, QFont::Bold));
     }
 
-//    glEnable(GL_DEPTH_TEST);
-//    glEnable(GL_LIGHTING);
     glPopMatrix();
 
 //    glFinish();

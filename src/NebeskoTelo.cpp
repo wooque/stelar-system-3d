@@ -9,6 +9,13 @@ using std::tuple;
 using std::make_tuple;
 using std::get;
 
+// test
+#include <iostream>
+using std::cout;
+using std::endl;
+//
+
+
 void NebeskoTelo::crtajSferu(float radius, int br_segmenata)
 {
     float step = 90.0f / br_segmenata;
@@ -148,11 +155,11 @@ void NebeskoTelo::pomeri(int proteklo_vreme)
 
 tuple<float, float, float> NebeskoTelo::getPos() const
 {
-    double new_r = -sin(ugao_revolucije * RAD_PER_DEG) * poluprecnik_revolucije;
-    return make_tuple<float, float, float>(
-                cos(ugao_revolucije * RAD_PER_DEG) * poluprecnik_revolucije,
-                new_r * sin(nagib*RAD_PER_DEG),
-                new_r * cos(nagib*RAD_PER_DEG));
+    double x = cos(ugao_revolucije * RAD_PER_DEG) * poluprecnik_revolucije;
+    double r = -sin(ugao_revolucije * RAD_PER_DEG) * poluprecnik_revolucije;
+    double z = r * cos(nagib_ravni * RAD_PER_DEG);
+    double y = r * -sin(nagib_ravni * RAD_PER_DEG);
+    return make_tuple<float, float, float>(x,y,z);
 }
 
 void NebeskoTelo::crtajTelo() const

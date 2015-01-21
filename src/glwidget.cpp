@@ -100,6 +100,13 @@ unique_ptr<NebeskoTelo> GLWidget::loadStelarBody(const QString &conf_dir,
 
 void GLWidget::loadConfiguration(QString filename)
 {
+    // clear current state
+    bodies.clear();
+    view_body = 0;
+    ref_body = -1;
+    view_radius = 0.5;
+    view_mode = view_modes::AXIS;
+
     QString settings;
     QFile file;
     file.setFileName(filename);
@@ -267,9 +274,9 @@ void GLWidget::paintGL()
 
     case view_modes::SPHERE:
         r = view_radius * UNIV_R;
-        y_diff = sin(RAD_PER_DEG*scale_y*360) * r;
+        y_diff = -sin(RAD_PER_DEG*scale_y*360) * r;
         r2 = cos(RAD_PER_DEG*scale_y*360) * r;
-        x_diff = sin(RAD_PER_DEG*scale_x*360) * r2;
+        x_diff = -sin(RAD_PER_DEG*scale_x*360) * r2;
         z_diff = cos(RAD_PER_DEG*scale_x*360) * r2;
         gluLookAt(pos_x + x_diff, pos_y + y_diff, pos_z + z_diff, view_x, view_y, view_z, 0, 1, 0);
         break;

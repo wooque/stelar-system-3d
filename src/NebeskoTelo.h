@@ -35,15 +35,20 @@ public:
 class Svetlo
 {
 public:
+    int light_order;
     float   red;
     float   green;
     float   blue;
 
+    static const int LIGHTS[8];
+
 public:
-    Svetlo(float arg_red,
+    Svetlo(int arg_light_order,
+           float arg_red,
            float arg_green,
            float arg_blue)
-        : red(arg_red),
+        : light_order(arg_light_order),
+          red(arg_red),
           green(arg_green),
           blue(arg_blue) {}
 
@@ -108,6 +113,7 @@ public:
     static void crtajSferu(float radius, int br_segmenata);
     void crtaj(GLWidget *glw) const;
     void crtajTelo() const;
+    void crtajSvetlo() const;
 
     void pomeri(int proteklo_vreme);
 
@@ -126,7 +132,10 @@ public:
         prsten = std::move(arg_prsten);
     }
 
-    void crtajSvetlo() const;
+    void dodajSvetlo( std::unique_ptr<Svetlo> arg_svetlo )
+    {
+        svetlo = std::move(arg_svetlo);
+    }
 
     std::pair<float, float> getPos() const;
 };

@@ -33,10 +33,8 @@ using std::to_string;
 using std::string;
 
 const QString GLWidget::BACKGROUND = "background";
-const QString GLWidget::LIGHTING = "lighting";
-const QString GLWidget::AMBIENT = "ambient";
-const QString GLWidget::DIFUSE = "difuse";
-const QString GLWidget::POSITION = "position";
+const QString GLWidget::AMBIENT_LIGHTING = "ambient-lighting";
+const QString GLWidget::STAR_LIGHTING = "lighting";
 const QString GLWidget::STARS = "stars";
 const QString GLWidget::PLANETS = "planets";
 const QString GLWidget::NAME = "name";
@@ -70,9 +68,9 @@ GLWidget::~GLWidget()
     makeCurrent();
 }
 
-void GLWidget::loadLightingData(float *lighting, const QJsonObject &data, const QString &type)
+void GLWidget::loadLightingData(float *lighting, const QJsonValue &data)
 {
-    QJsonArray lightingArray = data[type].toArray();
+    QJsonArray lightingArray = data.toArray();
     int i = 0;
     for(const QJsonValue &lightingComponent: lightingArray)
     {
@@ -115,10 +113,7 @@ void GLWidget::loadConfiguration(QString filename)
     QJsonDocument systemJson = QJsonDocument::fromJson(settings.toUtf8());
     QJsonObject system = systemJson.object();
 
-    QJsonObject lightingData = system[LIGHTING].toObject();
-    loadLightingData(ambient, lightingData, AMBIENT);
-    loadLightingData(difuse, lightingData, DIFUSE);
-    loadLightingData(position, lightingData, POSITION);
+    loadLightingData(ambient, system[AMBIENT_LIGHTING]);
 
     QString background = system[BACKGROUND].toString();
     pozadina = unique_ptr<NebeskoTelo>(
@@ -127,10 +122,20 @@ void GLWidget::loadConfiguration(QString filename)
                                 true));
 
     QJsonArray starsArray = system[STARS].toArray();
+    int i = 1;
     for(const QJsonValue &starValue: starsArray)
     {
         QJsonObject star = starValue.toObject();
-        bodies.push_back(loadStelarBody(confDir, star, true, 50));
+        auto new_star = loadStelarBody(confDir, star, true, 50);
+
+        if (!star[STAR_LIGHTING].isNull() && i < 8)
+        {
+            float star_light[3];
+            loadLightingData(star_light, star[STAR_LIGHTING]);
+            new_star->dodajSvetlo(
+                        unique_ptr<Svetlo>(new Svetlo(i++,star_light[0],star_light[1],star_light[2])));
+        }
+        bodies.push_back(std::move(new_star));
     }
 
     QJsonArray planetsArray = system[PLANETS].toArray();
@@ -183,8 +188,6 @@ bool GLWidget::isInitialise() const
 
 void GLWidget::initializeGL()
 {
-    GLfloat AmbijentalnoSvetlo[] = { ambient[0], ambient[1], ambient[2], 1.0f };
-    GLfloat DifuznoSvetlo[] =      { difuse[0], difuse[1], difuse[2], 1.0f };
     glClearColor (0.0, 0.0, 0.0, 0.0);
     glShadeModel (GL_SMOOTH);
 
@@ -192,10 +195,9 @@ void GLWidget::initializeGL()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_NORMALIZE);
 
+    GLfloat AmbijentalnoSvetlo[] = { ambient[0], ambient[1], ambient[2], 1.0f };
     glLightfv(GL_LIGHT1, GL_AMBIENT, AmbijentalnoSvetlo);
-    glLightfv(GL_LIGHT1, GL_DIFFUSE, DifuznoSvetlo);
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, AmbijentalnoSvetlo);
-
     glEnable(GL_LIGHT1);
 
     glEnable(GL_BLEND);
@@ -206,8 +208,6 @@ void GLWidget::initializeGL()
 
 void GLWidget::paintGL()
 {
-    GLfloat PozicijaSvetla[] = {position[0], position[1], position[2], 1.0f };
-
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
@@ -280,8 +280,6 @@ void GLWidget::paintGL()
         break;
     }
 
-    glLightfv(GL_LIGHT1, GL_POSITION, PozicijaSvetla);
-
     // advancing time
     milliseconds proteklo = milliseconds::zero();
     if( prethodno_vreme != system_clock::time_point::min() )
@@ -306,11 +304,11 @@ void GLWidget::paintGL()
     glPushMatrix();
     glLoadIdentity();
     gluPerspective(60, (GLfloat)win_width/(GLfloat)win_height, 1, 2000);
-    glDisable(GL_LIGHTING);
-    glDisable(GL_DEPTH_TEST);
+    //glDisable(GL_LIGHTING);
+    //glDisable(GL_DEPTH_TEST);
     qglColor(Qt::white);
 
-    renderText(-2.2, 0.6, 0.0,
+    renderText(-2.1, 0.60, 0.0,
                QString::fromStdString("View mode: " + view_to_string(view_mode)),
                QFont("Arial", 12, QFont::Bold));
 
@@ -331,8 +329,8 @@ void GLWidget::paintGL()
                    QFont("Arial", 12, QFont::Bold));
     }
 
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_LIGHTING);
+//    glEnable(GL_DEPTH_TEST);
+//    glEnable(GL_LIGHTING);
     glPopMatrix();
 
 //    glFinish();
@@ -369,6 +367,30 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     scale_y = ((float)(y - win_height/2))/win_height;
 }
 
+int GLWidget::inc(int number, int max, int skip_number)
+{
+    if (number+1 < max)
+    {
+        if (number+1 != skip_number)
+            return number+1;
+        else if (number+2 < max)
+            return number+2;
+    }
+    return number;
+}
+
+int GLWidget::dec(int number, int min, int skip_number)
+{
+    if (number-1 >= min)
+    {
+        if (number-1 != skip_number)
+            return number-1;
+        else if (number-2 >= min)
+            return number-2;
+    }
+    return number;
+}
+
 void GLWidget::keyPressEvent(QKeyEvent *event)
 {
     if (!isInitialise())
@@ -381,23 +403,19 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         break;
 
     case Qt::Key_Up:
-        if (ref_body < (int)bodies.size()-1)
-            ref_body++;
+        ref_body = inc(ref_body, bodies.size(), view_body);
         break;
 
     case Qt::Key_Down:
-        if (ref_body >= 0)
-            ref_body --;
+        ref_body = dec(ref_body, -1, view_body);
         break;
 
     case Qt::Key_Left:
-        if (view_body >= 0)
-            view_body--;
+        view_body = dec(view_body, -1, ref_body);
         break;
 
     case Qt::Key_Right:
-        if (view_body < (int)bodies.size()-1)
-            view_body++;
+        view_body = inc(view_body, bodies.size(), ref_body);
         break;
 
     case Qt::Key_Z:

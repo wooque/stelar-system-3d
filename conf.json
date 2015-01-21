@@ -1,10 +1,6 @@
 {
     "background": "teksture/zvezde.bmp",
-    "lighting": {
-        "ambient": [0.1, 0.1, 0.1],
-        "difuse": [1.0, 1.0, 1.0],
-        "position": [0.0, 0.0, 0.0]
-    },
+    "ambient-lighting": [0.1, 0.1, 0.1],
     "stars": [
         {
             "name": "sun",
@@ -14,7 +10,8 @@
             "rotation_velocity": 0.05,
             "slope": 0,
             "rotation_slope": 0,
-            "texture": "teksture/gzvezda.bmp"
+            "texture": "teksture/gzvezda.bmp",
+            "lighting": [1.0, 1.0, 1.0]
         },
         {
             "name": "other sun",
@@ -24,7 +21,8 @@
             "rotation_velocity": 0.1,
             "slope": 0,
             "rotation_slope": 0,
-            "texture": "teksture/mesec.bmp"
+            "texture": "teksture/mesec.bmp",
+            "lighting": [1.0, 1.0, 1.0]
         }
      ],
     "planets": [

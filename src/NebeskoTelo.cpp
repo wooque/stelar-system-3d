@@ -5,6 +5,9 @@
 
 using std::unique_ptr;
 using std::move;
+using std::pair;
+using std::make_pair;
+using std::get;
 
 void NebeskoTelo::crtajSferu(float radius, int br_segmenata)
 {
@@ -149,9 +152,9 @@ void NebeskoTelo::pomeri(int proteklo_vreme)
 
 }
 
-std::pair<float, float> NebeskoTelo::getPos() const
+pair<float, float> NebeskoTelo::getPos() const
 {
-    return std::make_pair<float, float>(
+    return make_pair<float, float>(
                 cos(ugao_revolucije * RAD_PER_DEG) * poluprecnik_revolucije,
                 -sin(ugao_revolucije * RAD_PER_DEG) * poluprecnik_revolucije);
 }
@@ -191,6 +194,9 @@ void NebeskoTelo::crtajTelo() const
         glEnable(GL_LIGHTING);
     }
 
+    if (svetlo)
+        crtajSvetlo();
+
     glPopMatrix();
 }
 
@@ -199,7 +205,8 @@ void NebeskoTelo::crtajSvetlo() const
     if( !svetlo )
         return;
 
-    svetlo->crtajSvetlo(0.0f, 0.0f, 0.0f);
+    auto pos = getPos();
+    svetlo->crtajSvetlo(get<0>(pos), 0.0, get<1>(pos));
 }
 
 void Prsten::crtajPrsten() const
@@ -228,10 +235,15 @@ void Prsten::crtajPrsten() const
     glPopMatrix();
 }
 
+const int Svetlo::LIGHTS[8] = {GL_LIGHT0, GL_LIGHT1,
+                               GL_LIGHT2, GL_LIGHT3,
+                               GL_LIGHT4, GL_LIGHT5,
+                               GL_LIGHT6, GL_LIGHT7};
+
 void Svetlo::crtajSvetlo(float x, float y, float z) const
 {
     GLfloat DifuznoSvetlo[] = { red, green, blue, 1.0f };
-    glLightfv(GL_LIGHT1, GL_DIFFUSE, DifuznoSvetlo);
+    glLightfv(LIGHTS[light_order], GL_DIFFUSE, DifuznoSvetlo);
     GLfloat PozicijaSvetla[] = { x, y, z, 1.0f };
-    glLightfv(GL_LIGHT1, GL_POSITION, PozicijaSvetla);
+    glLightfv(LIGHTS[light_order], GL_POSITION, PozicijaSvetla);
 }

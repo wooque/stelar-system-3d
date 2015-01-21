@@ -31,8 +31,7 @@ private:
     void keyPressEvent(QKeyEvent *event);
     bool isInitialise() const;
 
-    void loadLightingData(float* lighting, const QJsonObject &data,
-                          const QString &type);
+    void loadLightingData(float* lighting, const QJsonValue &data);
     std::unique_ptr<NebeskoTelo> loadStelarBody(const QString &conf_dir,
                                                 const QJsonObject &data,
                                                 bool is_star,
@@ -40,6 +39,8 @@ private:
 
 
     static std::string view_to_string(view_modes mode);
+    static int inc(int number, int max, int skip_number);
+    static int dec(int number, int min, int skip_number);
 
 private slots:
     void advanceTime();
@@ -51,8 +52,6 @@ private:
     std::chrono::system_clock::time_point prethodno_vreme;
 
     float ambient[3] = {0.1, 0.1, 0.1};
-    float difuse[3] = {1.0, 1.0, 1.0};
-    float position[3] = {0.0, 0.0, 0.0};
 
     int win_width = 0;
     int win_height = 0;
@@ -67,10 +66,8 @@ private:
     float scale_y = 0.0f;
 
     static const QString BACKGROUND;
-    static const QString LIGHTING;
-    static const QString AMBIENT;
-    static const QString DIFUSE;
-    static const QString POSITION;
+    static const QString AMBIENT_LIGHTING;
+    static const QString STAR_LIGHTING;
     static const QString STARS;
     static const QString PLANETS;
     static const QString NAME;

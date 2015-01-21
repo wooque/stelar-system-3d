@@ -1,27 +1,27 @@
 {
     "background": "teksture/background.jpg",
-    "ambient-lighting": [0.1, 0.1, 0.9],
+    "ambient-lighting": [0.1, 0.7, 0.1],
     "stars": [
         {
-            "name": "Analog",
+            "name": "AStar",
             "radius": 3,
             "revolution_velocity": 0.03,
             "revolution_radius": 5,
             "rotation_velocity": 0.05,
             "slope": 0,
             "rotation_slope": 0,
-            "texture": "teksture/Analog.jpg",
-            "lighting": [0.1, 1.0,  0.1]
+            "texture": "teksture/AStar.png",
+            "lighting": [0.1, 0.1, 1.0]
         },
         {
-            "name": "Aquatis",
+            "name": "BStar",
             "radius": 2,
             "revolution_velocity": 0.1,
-            "revolution_radius": 31,
+            "revolution_radius": 15,
             "rotation_velocity": 0.1,
             "slope": 0,
             "rotation_slope": 0,
-            "texture": "teksture/aquatis.png",
+            "texture": "teksture/BStar.png",
             "lighting": [1.0, 0.1, 0.1]
         }
      ],
